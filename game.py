@@ -1,27 +1,25 @@
-from easygame import *
- 
-# Otvor okno s nadpisom "Panda simulator"
-# vo veľkosti 800px na šírku a 600px na výšku
-open_window('Panda simulator', 800, 600)
- 
-# Začni vykreslovať snímky v cykle (v predvolenej rýchlosti 60fps)
+import easygame, uihelper
+
+easygame.open_window('window', 800, 600)
+
+def testCallback(button):
+    print(button)
+
+group1 = uihelper.uiGroup()
+uihelper.uiElement(easygame.load_image("testbutton.png"),(400,300),group=group1,callback=testCallback)
+
 should_quit = False
 while not should_quit:
- 
-    # Načítaj udalosti pre aktuálnu snímku
-    for event in poll_events():
-        # Napríklad ak hráč spustí CloseEvent
-        # prestaň ďalej vykreslovať snímky a zatvor okno 
-        if type(event) is CloseEvent:
-            should_quit = True
-    
-    ###
-    # Tu patrí logika hry, ktorá na obrazovku niečo vykreslí
-    ###
- 
-    draw_polygon((0, 0), (500, 300), (200, 0))
 
-    # Pokračuj na ďalšiu snímku (a všetko opať prekresli)
-    next_frame()
+    for event in easygame.poll_events():
+        evtype = type(event)
+        if evtype is easygame.CloseEvent:
+            should_quit = True
+        if evtype is easygame.MouseDownEvent:
+            group1.checkGroup(event)
+
+    group1.renderGroup()
+
+    easygame.next_frame()
  
-close_window()
+easygame.close_window()

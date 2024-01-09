@@ -442,11 +442,9 @@ def load_sheet(path, frame_width, frame_height):
     """
     import pyglet
     img = pyglet.resource.image(path)
-    frames = []
     for x in map(lambda i: i * frame_width, range(img.width // frame_width)):
         for y in map(lambda i: i * frame_height, range(img.height // frame_height)):
-            frames.append(img.get_region(x, y, frame_width, frame_height))
-    return frames
+            yield(img.get_region(x, y, frame_width, frame_height))
 
 def image_data(image):
     """Returns a list of RGBA values of pixels of the image.
