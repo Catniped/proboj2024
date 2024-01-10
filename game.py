@@ -1,6 +1,10 @@
 import easygame, uihelper
 
-window = easygame.open_window('window', None, None, True)
+window = easygame.open_window('window', None, None, True, resizable=True)
+
+@window.event
+def on_resize(width, height):
+    print("new window size:", width, height)
 
 def testCallback(button):
     print(button)
@@ -20,10 +24,9 @@ enemy = uihelper.enemyElement(easygame.load_image("Assets/Sprites/Towers/Archer/
 """
 
 down = False
-fullscreen = False
+fullscreen = True
 should_quit = False
 while not should_quit:
-
     for event in easygame.poll_events():
         evtype = type(event)
         if evtype is easygame.CloseEvent:

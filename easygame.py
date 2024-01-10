@@ -254,7 +254,7 @@ def _update_camera():
     _ctx._program.uniforms['projection'].set(proj_matrix @ matrix)
 
 
-def open_window(title, width, height, fullscreen, fps=60, double_buffer=True):
+def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, resizable=False):
     """Open a window with the specified parameters. Only one window can be open at any time.
 
     Arguments:
@@ -273,7 +273,7 @@ def open_window(title, width, height, fullscreen, fps=60, double_buffer=True):
     config = None
     if not double_buffer:
         config = pyglet.gl.Config(double_buffer = False)
-    _ctx._win = pyglet.window.Window(fullscreen=fullscreen, caption=title, width=width, height=height, config=config)
+    _ctx._win = pyglet.window.Window(fullscreen=fullscreen, caption=title, width=width, height=height, config=config, resizable=resizable)
     _ctx._fps = fps
     _ctx._ui_batch = pyglet.graphics.Batch()
     _ctx._win.switch_to()
