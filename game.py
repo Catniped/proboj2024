@@ -1,4 +1,6 @@
-import easygame, uihelper
+import easygame, uihelper, time
+
+x = 1
 
 window = easygame.open_window('window', None, None, True, resizable=True)
 
@@ -62,7 +64,8 @@ while not should_quit:
     
     enemy.move()
     group2.renderGroup(window)
-
+    delta = x - time.time()
+    x = time.time()
     easygame.next_frame()
  
 easygame.close_window()

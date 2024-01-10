@@ -7,6 +7,7 @@ def degrees(d):
     import math
     return d / 180 * math.pi
 
+
 def rotate(vector, angle):
     """Rotate a vector (x, y) by an angle in radians."""
     import math
