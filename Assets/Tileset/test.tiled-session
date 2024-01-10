@@ -1,0 +1,113 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "archer_level_1_256x327.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "crystal(3).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "grass.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "map.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
+            "scale": 0.125,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 8348,
+                "y": 1464
+            }
+        },
+        "road_desert(1).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "road_desert(2).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "road_desert(9).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "road_spring(1).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "road_spring(11).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "road_spring(12).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "road_spring(2).tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "sand.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "snow.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "stone1.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "stone2.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "D:/My Documents/GitHub/proboj2024/Assets/Sprites/Enviroument tiles",
+    "map.fixedSize": true,
+    "map.height": 32,
+    "map.lastUsedFormat": "tmx",
+    "map.orientation": null,
+    "map.tileHeight": 145,
+    "map.tileWidth": 256,
+    "map.width": 32,
+    "openFiles": [
+        "map.tmx",
+        "road_desert(9).tsx",
+        "road_desert(1).tsx",
+        "crystal(3).tsx"
+    ],
+    "project": "test.tiled-project",
+    "recentFiles": [
+        "crystal(3).tsx",
+        "road_desert(1).tsx",
+        "road_desert(9).tsx",
+        "map.tmx",
+        "road_desert(2).tsx",
+        "road_spring(12).tsx",
+        "road_spring(2).tsx",
+        "road_spring(11).tsx",
+        "snow.tsx",
+        "road_spring(1).tsx",
+        "archer_level_1_256x327.tsx",
+        "stone2.tsx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 143,
+        "width": 121
+    }
+}

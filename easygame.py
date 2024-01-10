@@ -122,6 +122,9 @@ def _symbol_to_string(key):
             pyglet.window.key.RIGHT: 'RIGHT',
             pyglet.window.key.UP: 'UP',
             pyglet.window.key.DOWN: 'DOWN',
+            pyglet.window.key.F11: 'F11',
+            pyglet.window.key.MINUS: 'MINUS',
+            pyglet.window.key.PLUS: 'PLUS',
 
             pyglet.window.mouse.LEFT: 'LEFT',
             pyglet.window.mouse.RIGHT: 'RIGHT',
@@ -180,6 +183,22 @@ class MouseMoveEvent:
         self.y = y
         self.dx = dx
         self.dy = dy
+
+
+class MouseScrollEvent:
+    """Happens when user scrolls the mouse wheel.
+
+    Fields:
+    x  -- The current X coordinate of the mouse.
+    y  -- The current Y coordinate of the mouse.
+    scroll_x -- Difference from the previous X coordinate.
+    scroll_y -- Difference from the previous Y coordinate.
+    """
+    def __init__(self, x, y, scroll_x, scroll_y):
+        self.x = x
+        self.y = y
+        self.scroll_x = scroll_x
+        self.scroll_y = scroll_y
 
 class MouseDownEvent:
     """Happens when user presses a mouse button.
@@ -330,6 +349,12 @@ def open_window(title, width, height, fullscreen, fps=60, double_buffer=True):
         if button is None:
             return
         _ctx._events.append(MouseUpEvent(x, y, button))
+        return pyglet.event.EVENT_HANDLED   
+    
+    @_ctx._win.event       
+    def on_mouse_scroll(x, y, scroll_x, scroll_y):
+        global _ctx
+        _ctx._events.append(MouseScrollEvent(x, y, scroll_x, scroll_y))
         return pyglet.event.EVENT_HANDLED
 
     return _ctx._win

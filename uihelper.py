@@ -25,7 +25,7 @@ class uiGroup:
             if element.visible:
                 draw_image(element.image, element.position, element.anchor, element.rotation, element.scale, element.scale_x, element.scale_y, element.opacity, element.pixelated, element.ui)
 
-    def renderGroup(self):
+    def renderGroup(self, window):
         """Renders all elements in UI Group, only considers parent group visibility"""
         if self.visible:
             for element in self.elements:
@@ -40,7 +40,7 @@ class uiGroup:
 
 class uiElement:
     """Image used in the UI"""
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -56,12 +56,56 @@ class uiElement:
         self.enabled = True
         self.visible = True
         self.callback = callback
-        self.ui = False
+        self.ui = ui
 
         group.elements.append(self)
     
     def clicked(self, button):
         self.callback(button)
+
+class enemyElement:
+    """Image used in the UI"""
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, health=10, ):
+        self.image = image
+        self.width = image.width
+        self.height = image.height
+        self.center = image.center
+        self.position = position
+        self.anchor = anchor
+        self.rotation = rotation
+        self.scale = scale
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+        self.opacity = opacity
+        self.pixelated = pixelated
+        self.enabled = True
+        self.visible = True
+        self.callback = callback
+        self.ui = ui
+
+        self.health = health
+        self.speed = 1
+        self.routeto = None
+        self.velocity = (0,0)
+        self.waypoints = [(1020, 300)]
+
+        group.elements.append(self)
+    
+    def clicked(self, button):
+        self.callback(button)
+    
+    def move(self):
+        x,y = self.position
+        if self.routeto:
+            rx,ry = self.routeto
+            if x > rx and y > ry:
+                xv, yv = self.velocity
+                self.position = (x-xv,y-yv)
+        elif self.waypoints[0]:
+            self.routeto = self.waypoints.pop(0)
+            rx,ry = self.routeto
+            self.velocity = (self.speed,((ry - y)/(rx - x))*self.speed)
+
 
 """def loadSheetOOP(path, frame_width, frame_height, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None):
     for i in load_sheet(path, frame_width, frame_height):
@@ -82,3 +126,10 @@ def checkIntersection(position: tuple, width, height, point: tuple):
         return True
     
     return False
+
+def drawCentered(image, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, ui=False, window=None):
+    x,y = position
+
+    position_e = (x-((((image.width-1400)*scale)/2)-(window.width/2)),y-(((image.height*scale)/2)-(window.height/2)))
+
+    draw_image(image, position_e, anchor, rotation, scale, scale_x, scale_y, opacity, pixelated, ui)
