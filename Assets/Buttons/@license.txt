@@ -1,0 +1,15 @@
+ __   __          __        ___  __  
+|__) |__) | |\ | |__) |    |__  /__` 
+|    |  \ | | \| |__) |___ |___ .__/ 
+                                     
+           GAMEDEV STUFF             
+
+License:
+
+- This asset CAN be used in any personal and commercial project.
+
+- You MAY modify the asset as you wish.
+
+- The asset CAN NOT be reselled/redistributed.
+
+- Credit is NOT required but would be appreciated.
