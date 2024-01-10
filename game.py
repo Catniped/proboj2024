@@ -1,4 +1,4 @@
-import easygame, uihelper, time
+import easygame, uihelper
 
 x = 1
 
