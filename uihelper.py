@@ -1,4 +1,5 @@
-from easygame import draw_image, load_sheet, draw_circle
+from easygame import draw_image
+import easygame, numpy
 from math import isclose
 
 class uiGroup:
@@ -79,7 +80,7 @@ class enemyElement:
         self.scale_y = scale_y
         self.opacity = opacity
         self.pixelated = pixelated
-        self.enabled = True
+        self.enabled = False
         self.visible = True
         self.callback = callback
         self.ui = ui
@@ -110,10 +111,82 @@ class enemyElement:
             ys = ((ry - y)/-abs(rx - x))*self.speed
             self.velocity = (self.speed if rx < x else -self.speed, ys if ry < y else ys)
 
+class archerTowerElement:
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=100):
+        self.image = image
+        self.width = image.width
+        self.height = image.height
+        self.center = image.center
+        self.position = position
+        self.anchor = anchor
+        self.rotation = rotation
+        self.scale = scale
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+        self.opacity = opacity
+        self.pixelated = pixelated
+        self.enabled = True
+        self.visible = True
+        self.callback = callback
+        self.ui = ui
+
+        self.damage = damage
+        self.speed = speed
+        self.radius = radius
+
+        group.elements.append(self)
+
+    def shoot(self,enemyxy,enemyspeed,enemyvector):
+        target = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
+        vector = easygame.rotate(vector,easygame.degrees(6))/numpy.linalg.norm(vector)
+        return vector
+    
+    def projectile(position):
+        vector = easygame.rotate(vector,easygame.degrees(6))/numpy.linalg.norm(vector)
+        position += vector
+        return position
+    
+class mageTowerElement:
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
+        self.image = image
+        self.width = image.width
+        self.height = image.height
+        self.center = image.center
+        self.position = position
+        self.anchor = anchor
+        self.rotation = rotation
+        self.scale = scale
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+        self.opacity = opacity
+        self.pixelated = pixelated
+        self.enabled = True
+        self.visible = True
+        self.callback = callback
+        self.ui = ui
+
+        self.damage = damage
+        self.speed = speed
+        self.radius = radius
+        
+        group.elements.append(self)
+        
+    def shoot(self,enemyxy):
+        self.placement += enemyxy[0] - self.placement[0],enemyxy[1] - self.placement[1]
 
 """def loadSheetOOP(path, frame_width, frame_height, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None):
     for i in load_sheet(path, frame_width, frame_height):
         yield(uiElement(i, position, anchor, rotation, scale, scale_x, scale_y, opacity, pixelated, group, callback))"""
+
+def placeTower(tower, mousex, mousey, down):
+    tower.position = (mousex,mousey)
+    tower.opacity = 0.8
+    easygame.draw_circle((mousex,mousey),tower.radius,color=(1,0,0,0.2))
+    if down:
+        tower.opacity = 1
+        return True
+    return False
+
 
 def checkIntersection(position: tuple, width, height, point: tuple):
     """ASSUMES RECTANGLE WITH ROTATION = 0
