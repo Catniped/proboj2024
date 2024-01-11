@@ -1,15 +1,10 @@
 import easygame, uihelper, pyglet
 
 window = easygame.open_window('window', None, None, True, resizable=True)
+ArrowTower = uihelper.archerTowerElement()
 
 def testCallback(button):
     print(button)
-
-
-#docasne variables
-cooldown = 0
-arrows = []
-############
 
 mapi = easygame.load_image("Assets/Tileset/map.png")
 offset = -(mapi.width*0.2 - window.width*2)
@@ -19,6 +14,8 @@ group3 = uihelper.uiGroup()
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=group1,scale=2,callback=testCallback,ui=True)
 enemy = uihelper.enemyElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(1362,495),group=group2,scale=0.3)
 
+cooldown = 0
+arrows = []
 mousex = (0,0)
 mousey = (0,0)
 placetower = False
@@ -71,9 +68,9 @@ while not should_quit:
 
 #arrow logic
     if cooldown == 30:
-        arrows.append([100,100],uihelper.archerTowerElement.target([10,10],10,[20,20]))
+        arrows.append([100,100],ArrowTower.target([10,10],10,[20,20]))
     for arrow in arrows:
-        uihelper.archerTowerElement.move_arrow(arrow[0],arrow[1])
+        ArrowTower.move_arrow(arrow[0],arrow[1])
 
     cooldown += 1
 

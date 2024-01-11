@@ -138,6 +138,7 @@ class archerTowerElement:
     def target(self,enemyxy,enemyspeed,enemyvector):
         target = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
         return target
+    
     def move_arrow(self,pos,target):
         pos[0] += target[0]/30
         pos[1] += target[1]/30
