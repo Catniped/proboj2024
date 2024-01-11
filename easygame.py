@@ -7,6 +7,7 @@ def degrees(d):
     import math
     return d / 180 * math.pi
 
+
 def rotate(vector, angle):
     """Rotate a vector (x, y) by an angle in radians."""
     import math
@@ -57,7 +58,6 @@ class _Context:
     _win: pyglet.window.Window = None
     _fps = 60
     _ui_batch: pyglet.graphics.Batch = None
-    _batch: pyglet.graphics.Batch = None
     _events = []
     _camera: _Camera = _Camera((0, 0), (0, 0), 0, 1)
     _saved_cameras: [_Camera] = []
@@ -239,10 +239,10 @@ def _update_camera():
         0, _ctx._win.width, 0, _ctx._win.height, -255, 255
     )
     pyglet.window.projection = proj_matrix
-    
+    _ctx._program.uniforms['projection'].set(proj_matrix)
+
     # Handle non scaled GUI
     _ctx._win.view = Mat4()
-    _ctx._program.uniforms['projection'].set(proj_matrix)
     _ctx._ui_batch.draw()
 
     # Projection for the rest of the game
@@ -253,10 +253,9 @@ def _update_camera():
     matrix = matrix.translate(Vec3(-_ctx._camera.position[0], -_ctx._camera.position[1], 0))
     _ctx._win.view = matrix
     _ctx._program.uniforms['projection'].set(proj_matrix @ matrix)
-    _ctx._batch.draw()
 
 
-def open_window(title, width, height, fullscreen, fps=60, double_buffer=True):
+def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, resizable=False):
     """Open a window with the specified parameters. Only one window can be open at any time.
 
     Arguments:
@@ -275,10 +274,9 @@ def open_window(title, width, height, fullscreen, fps=60, double_buffer=True):
     config = None
     if not double_buffer:
         config = pyglet.gl.Config(double_buffer = False)
-    _ctx._win = pyglet.window.Window(caption=title, width=width, height=height, config=config, fullscreen=fullscreen)
+    _ctx._win = pyglet.window.Window(fullscreen=fullscreen, caption=title, width=width, height=height, config=config, resizable=resizable)
     _ctx._fps = fps
     _ctx._ui_batch = pyglet.graphics.Batch()
-    _ctx._batch = pyglet.graphics.Batch()
     _ctx._win.switch_to()
     _ctx._camera = _Camera((0, 0), (0, 0), 0, 1)
     _ctx._saved_cameras = []
@@ -470,11 +468,9 @@ def load_sheet(path, frame_width, frame_height):
     """
     import pyglet
     img = pyglet.resource.image(path)
-    frames = []
     for x in map(lambda i: i * frame_width, range(img.width // frame_width)):
         for y in map(lambda i: i * frame_height, range(img.height // frame_height)):
-            frames.append(img.get_region(x, y, frame_width, frame_height))
-    return frames
+            yield(img.get_region(x, y, frame_width, frame_height))
 
 def image_data(image):
     """Returns a list of RGBA values of pixels of the image.
@@ -565,11 +561,13 @@ def draw_polygon(*points, color=(1, 1, 1, 1), ui=False):
         for point in triangle:
             render_points.append(point[0])
             render_points.append(point[1])
-    
-    _ctx._program.vertex_list(len(triangles)*3, pyglet.gl.GL_TRIANGLES, _ctx._ui_batch if ui else _ctx._batch , None,
+
+    poly_batch = pyglet.graphics.Batch()
+    _ctx._program.vertex_list(len(triangles)*3, pyglet.gl.GL_TRIANGLES, _ctx._ui_batch if ui else poly_batch , None,
         position=('f', tuple(render_points)),
         colors=('Bn', tuple(int(x*255) for x in color * (3*len(triangles)))),
     )
+    poly_batch.draw()
 
 
 def draw_line(*points, thickness=1, color=(1, 1, 1, 1), ui=False):
@@ -641,7 +639,7 @@ def draw_text(text, font, size, position=(0, 0), anchor=("left", "bottom"), colo
     if _ctx._win is None:
         raise EasyGameError('window not open')
     if (font, size) not in _ctx._fonts:
-        _ctx._fonts[(font, size)] = pyglet.text.Label(font_name=font, font_size=size, batch=_ctx._ui_batch if ui else _ctx._batch)
+        _ctx._fonts[(font, size)] = pyglet.text.Label(font_name=font, font_size=size, batch=_ctx._ui_batch if ui else None)
     label: pyglet.text.Label = _ctx._fonts[(font, size)]
     label.text = text
     label.color = tuple(map(lambda c: int(c*255), color))
@@ -649,7 +647,7 @@ def draw_text(text, font, size, position=(0, 0), anchor=("left", "bottom"), colo
     label.italic = italic
     (label.anchor_x, label.anchor_y) = anchor
     label.x, label.y = position
-    # if not ui: label.draw()
+    if not ui: label.draw()
 
 def set_camera(center=None, position=None, rotation=None, zoom=None):
     """Set properties of the camera. Only properties you set will be changed.

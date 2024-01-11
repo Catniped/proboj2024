@@ -1,2 +1,3 @@
 pyglet==2.0.10
 tripy==1.0.0
+numpy==1.26.3
