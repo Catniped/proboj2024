@@ -37,8 +37,16 @@ class uiGroup:
         """Checks whether an element in the group was clicked by the event passed, if true activates callback of the element"""
         if self.enabled:
             for element in self.elements:
-                if checkIntersection(element.position, element.width, element.height, (event.x, event.y)):
+                if checkIntersection(element.position, element.width*2, element.height*2, (event.x, event.y)):
                     element.clicked(event.button)
+    
+    def kill(self, obj):
+        try:
+            self.elements.remove(obj)
+            return True
+        except ValueError:
+            return False
+
 
 class uiElement:
     """Image used in the UI"""
@@ -67,7 +75,7 @@ class uiElement:
 
 class enemyElement:
     """Image used in the UI"""
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, health=10, speed=1):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, health=10, speed=1, reward=1):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -85,6 +93,7 @@ class enemyElement:
         self.callback = callback
         self.ui = ui
 
+        self.reward = reward
         self.health = health
         self.speed = speed
         self.routeto = None
@@ -138,13 +147,20 @@ class archerTowerElement:
 
         group.elements.append(self)
     
-    def cooldownCheck(self, enemygroup):
+    def cooldownCheck(self, enemygroup, balance):
         if self.cooldown > 0:
             self.cooldown-=1
         else:
             if self.enabled:
                 if self.target:
-                    self.target.opacity = 0.1
+                    self.target.health-=self.damage
+                    if self.target.health <= 0:
+                        self.target.opacity = 0.8
+                        i = self.target
+                        r = i.reward
+                        self.target = None
+                        if enemygroup.kill(i): return r
+                    self.cooldown = self.speed
                 else:
                     for enemy in enemygroup.elements:
                         ex,ey = enemy.position
@@ -196,7 +212,10 @@ class mageTowerElement:
     for i in load_sheet(path, frame_width, frame_height):
         yield(uiElement(i, position, anchor, rotation, scale, scale_x, scale_y, opacity, pixelated, group, callback))"""
 
-def placeTower(tower, mousex, mousey, down):
+def placeTower(tower, umousex, umousey, down):
+    scale = easygame.get_camera().zoom
+    mousex = umousex/scale
+    mousey = umousey/scale
     tower.position = (mousex,mousey)
     tower.opacity = 0.8
     easygame.draw_circle((mousex,mousey),tower.radius,color=(1,0,0,0.2))

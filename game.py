@@ -1,9 +1,9 @@
 import easygame, uihelper, pyglet
 
-window = easygame.open_window('window', None, None, False, resizable=True)
+window = easygame.open_window('window', 1600, 900, False, resizable=False)
 
 def testCallback(button):
-    print(button)
+    uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3,health=100)
 
 mapi = easygame.load_image("Assets/Tileset/map.png")
 offset = -(mapi.width*0.2 - window.width*2)
@@ -13,14 +13,16 @@ enemies = uihelper.uiGroup()
 towers = uihelper.uiGroup()
 projectiles = uihelper.uiGroup()
 
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=2,callback=testCallback,ui=True)
-enemy = uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=testCallback,ui=True)
 
+balance = 1000
+balanceprev = 0
 cooldown = 0
 arrows = []
 mousex = (0,0)
 mousey = (0,0)
 placetower = False
+cancel = False
 downrm = False
 downl = False
 fullscreen = True
@@ -52,10 +54,13 @@ while not should_quit:
                 fullscreen = not fullscreen
                 window.set_fullscreen(fullscreen)
             elif event.key == "E":
-                print("pos", mousex, camera.position)
-                tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=group3,scale=0.3)
                 tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3)
                 placetower = True
+            elif event.key == "ESC":
+                cancel = True
+        elif evtype is easygame.KeyUpEvent:
+            if event.key == "ESC":
+                cancel = False
         elif evtype is easygame.MouseScrollEvent:
             if event.scroll_y > 0:
                 easygame.move_camera(zoom=1.2)
@@ -67,20 +72,33 @@ while not should_quit:
     uihelper.drawCentered(mapi,scale=0.15,position=(offset,0),window=window)
 
     """logic"""
-    enemy.move()
+    for enemy in enemies.elements:
+        enemy.move()
+
     if placetower:
-        if uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downl):
+        if cancel:
+            towers.kill(tower)
+            placetower = False
+            tower = None
+        elif uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downl):
             placetower = False
             tower = None
 
     for tower in towers.elements:
-        tower.cooldownCheck(enemies)
+        r=tower.cooldownCheck(enemies, balance)
+        if r:
+            balance+=r
+            
+    if balanceprev != balance:
+        print(f"Balance changed: {balance}, +{balance-balanceprev}")
+        balanceprev = balance
 
 
     """rendering"""
     ui1.renderGroup(window)
     towers.renderGroup(window)
     enemies.renderGroup(window)
+    easygame.draw_text(str(balance),"Poppins",50,(100,200),ui=True)
     easygame.next_frame()
  
 easygame.close_window()

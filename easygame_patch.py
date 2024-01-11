@@ -121,10 +121,6 @@ def _symbol_to_string(key):
             pyglet.window.key.RIGHT: 'RIGHT',
             pyglet.window.key.UP: 'UP',
             pyglet.window.key.DOWN: 'DOWN',
-            pyglet.window.key.F11: 'F11',
-            pyglet.window.key.MINUS: 'MINUS',
-            pyglet.window.key.PLUS: 'PLUS',
-            pyglet.window.key.ESCAPE: "ESC",
 
             pyglet.window.mouse.LEFT: 'LEFT',
             pyglet.window.mouse.RIGHT: 'RIGHT',
@@ -183,22 +179,6 @@ class MouseMoveEvent:
         self.y = y
         self.dx = dx
         self.dy = dy
-
-
-class MouseScrollEvent:
-    """Happens when user scrolls the mouse wheel.
-
-    Fields:
-    x  -- The current X coordinate of the mouse.
-    y  -- The current Y coordinate of the mouse.
-    scroll_x -- Difference from the previous X coordinate.
-    scroll_y -- Difference from the previous Y coordinate.
-    """
-    def __init__(self, x, y, scroll_x, scroll_y):
-        self.x = x
-        self.y = y
-        self.scroll_x = scroll_x
-        self.scroll_y = scroll_y
 
 class MouseDownEvent:
     """Happens when user presses a mouse button.
@@ -260,7 +240,8 @@ def _set_view_ui():
     _ctx._win.view = Mat4()
     _ctx._program.uniforms['projection'].set(proj_matrix)
 
-def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, resizable=False):
+
+def open_window(title, width, height, fps=60, double_buffer=True):
     """Open a window with the specified parameters. Only one window can be open at any time.
 
     Arguments:
@@ -279,7 +260,7 @@ def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, re
     config = None
     if not double_buffer:
         config = pyglet.gl.Config(double_buffer = False)
-    _ctx._win = pyglet.window.Window(fullscreen=fullscreen, caption=title, width=width, height=height, config=config, resizable=resizable)
+    _ctx._win = pyglet.window.Window(caption=title, width=width, height=height, config=config)
     _ctx._fps = fps
     _ctx._win.switch_to()
     _ctx._camera = _Camera((0, 0), (0, 0), 0, 1)
@@ -354,12 +335,6 @@ def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, re
         if button is None:
             return
         _ctx._events.append(MouseUpEvent(x, y, button))
-        return pyglet.event.EVENT_HANDLED   
-    
-    @_ctx._win.event       
-    def on_mouse_scroll(x, y, scroll_x, scroll_y):
-        global _ctx
-        _ctx._events.append(MouseScrollEvent(x, y, scroll_x, scroll_y))
         return pyglet.event.EVENT_HANDLED
 
     return _ctx._win
@@ -665,12 +640,6 @@ def draw_text(text, font, size, position=(0, 0), anchor=("left", "bottom"), colo
     else: _set_view_ortho()
     label.draw()
     if ui: _set_view_ortho()
-
-def get_camera():
-    global _ctx
-    if _ctx._win is None:
-        raise EasyGameError('window not open')
-    return _ctx._camera
 
 def set_camera(center=None, position=None, rotation=None, zoom=None):
     """Set properties of the camera. Only properties you set will be changed.

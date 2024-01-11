@@ -56,6 +56,8 @@ class _Context:
     import pyglet
     _win: pyglet.window.Window = None
     _fps = 60
+    _ui_batch: pyglet.graphics.Batch = None
+    _batch: pyglet.graphics.Batch = None
     _events = []
     _camera: _Camera = _Camera((0, 0), (0, 0), 0, 1)
     _saved_cameras: [_Camera] = []
@@ -121,10 +123,6 @@ def _symbol_to_string(key):
             pyglet.window.key.RIGHT: 'RIGHT',
             pyglet.window.key.UP: 'UP',
             pyglet.window.key.DOWN: 'DOWN',
-            pyglet.window.key.F11: 'F11',
-            pyglet.window.key.MINUS: 'MINUS',
-            pyglet.window.key.PLUS: 'PLUS',
-            pyglet.window.key.ESCAPE: "ESC",
 
             pyglet.window.mouse.LEFT: 'LEFT',
             pyglet.window.mouse.RIGHT: 'RIGHT',
@@ -184,22 +182,6 @@ class MouseMoveEvent:
         self.dx = dx
         self.dy = dy
 
-
-class MouseScrollEvent:
-    """Happens when user scrolls the mouse wheel.
-
-    Fields:
-    x  -- The current X coordinate of the mouse.
-    y  -- The current Y coordinate of the mouse.
-    scroll_x -- Difference from the previous X coordinate.
-    scroll_y -- Difference from the previous Y coordinate.
-    """
-    def __init__(self, x, y, scroll_x, scroll_y):
-        self.x = x
-        self.y = y
-        self.scroll_x = scroll_x
-        self.scroll_y = scroll_y
-
 class MouseDownEvent:
     """Happens when user presses a mouse button.
 
@@ -230,10 +212,6 @@ class MouseUpEvent:
 
 def _update_camera():
     global _ctx
-    pass
-
-def _set_view_ortho():
-    global _ctx
     import math
     import pyglet
     from pyglet.math import Mat4, Vec3
@@ -241,26 +219,25 @@ def _set_view_ortho():
     proj_matrix = Mat4.orthogonal_projection(
         0, _ctx._win.width, 0, _ctx._win.height, -255, 255
     )
-    matrix = Mat4()
+    pyglet.window.projection = proj_matrix
+    
+    # Handle non scaled GUI
+    _ctx._win.view = Mat4()
+    _ctx._program.uniforms['projection'].set(proj_matrix)
+    _ctx._ui_batch.draw()
+
+    # Projection for the rest of the game
+    matrix = _ctx._win.view
     matrix = matrix.from_translation(Vec3(_ctx._camera.center[0], _ctx._camera.center[1], 0))
     matrix = matrix.rotate((-_ctx._camera.rotation/math.pi*180), Vec3(0, 0, 1))
     matrix = matrix.scale(Vec3(_ctx._camera.zoom, _ctx._camera.zoom, 0))
     matrix = matrix.translate(Vec3(-_ctx._camera.position[0], -_ctx._camera.position[1], 0))
     _ctx._win.view = matrix
     _ctx._program.uniforms['projection'].set(proj_matrix @ matrix)
+    _ctx._batch.draw()
 
-def _set_view_ui():
-    global _ctx
-    import pyglet
-    from pyglet.math import Mat4
-    pyglet.gl.glViewport(0, 0, _ctx._win.width, _ctx._win.height)
-    proj_matrix = Mat4.orthogonal_projection(
-        0, _ctx._win.width, 0, _ctx._win.height, -255, 255
-    )
-    _ctx._win.view = Mat4()
-    _ctx._program.uniforms['projection'].set(proj_matrix)
 
-def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, resizable=False):
+def open_window(title, width, height, fps=60, double_buffer=True):
     """Open a window with the specified parameters. Only one window can be open at any time.
 
     Arguments:
@@ -279,8 +256,10 @@ def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, re
     config = None
     if not double_buffer:
         config = pyglet.gl.Config(double_buffer = False)
-    _ctx._win = pyglet.window.Window(fullscreen=fullscreen, caption=title, width=width, height=height, config=config, resizable=resizable)
+    _ctx._win = pyglet.window.Window(caption=title, width=width, height=height, config=config)
     _ctx._fps = fps
+    _ctx._ui_batch = pyglet.graphics.Batch()
+    _ctx._batch = pyglet.graphics.Batch()
     _ctx._win.switch_to()
     _ctx._camera = _Camera((0, 0), (0, 0), 0, 1)
     _ctx._saved_cameras = []
@@ -354,12 +333,6 @@ def open_window(title, width, height, fullscreen, fps=60, double_buffer=True, re
         if button is None:
             return
         _ctx._events.append(MouseUpEvent(x, y, button))
-        return pyglet.event.EVENT_HANDLED   
-    
-    @_ctx._win.event       
-    def on_mouse_scroll(x, y, scroll_x, scroll_y):
-        global _ctx
-        _ctx._events.append(MouseScrollEvent(x, y, scroll_x, scroll_y))
         return pyglet.event.EVENT_HANDLED
 
     return _ctx._win
@@ -519,6 +492,7 @@ def draw_image(image, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x
         anchor = image.center
 
     image._img.anchor_x, image._img.anchor_y = anchor
+    image._sprite.batch = _ctx._ui_batch if ui else None
     image._sprite.update(
         x=position[0],
         y=position[1],
@@ -539,10 +513,7 @@ def draw_image(image, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x
         pyglet.gl.glTexParameteri(pyglet.gl.GL_TEXTURE_2D, pyglet.gl.GL_TEXTURE_MIN_FILTER, pyglet.gl.GL_LINEAR)
         pyglet.gl.glTexParameteri(pyglet.gl.GL_TEXTURE_2D, pyglet.gl.GL_TEXTURE_MAG_FILTER, pyglet.gl.GL_LINEAR)
 
-    if ui: _set_view_ui()
-    else: _set_view_ortho()
-    image._sprite.draw()
-    if ui: _set_view_ortho()
+    if not ui: image._sprite.draw()
 
 def draw_polygon(*points, color=(1, 1, 1, 1), ui=False):
     """Draw a convex polygon, respecting the current camera settings.
@@ -570,18 +541,10 @@ def draw_polygon(*points, color=(1, 1, 1, 1), ui=False):
             render_points.append(point[0])
             render_points.append(point[1])
     
-    poly_batch = pyglet.graphics.Batch()
-    polygon = _ctx._program.vertex_list(len(triangles)*3, pyglet.gl.GL_TRIANGLES, poly_batch, None,
+    _ctx._program.vertex_list(len(triangles)*3, pyglet.gl.GL_TRIANGLES, _ctx._ui_batch if ui else _ctx._batch , None,
         position=('f', tuple(render_points)),
         colors=('Bn', tuple(int(x*255) for x in color * (3*len(triangles)))),
     )
-    
-    if ui: _set_view_ui()
-    else: _set_view_ortho()
-    pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
-    pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-    poly_batch.draw()
-    if ui: _set_view_ortho()
 
 
 def draw_line(*points, thickness=1, color=(1, 1, 1, 1), ui=False):
@@ -653,7 +616,7 @@ def draw_text(text, font, size, position=(0, 0), anchor=("left", "bottom"), colo
     if _ctx._win is None:
         raise EasyGameError('window not open')
     if (font, size) not in _ctx._fonts:
-        _ctx._fonts[(font, size)] = pyglet.text.Label(font_name=font, font_size=size)
+        _ctx._fonts[(font, size)] = pyglet.text.Label(font_name=font, font_size=size, batch=_ctx._ui_batch if ui else _ctx._batch)
     label: pyglet.text.Label = _ctx._fonts[(font, size)]
     label.text = text
     label.color = tuple(map(lambda c: int(c*255), color))
@@ -661,16 +624,7 @@ def draw_text(text, font, size, position=(0, 0), anchor=("left", "bottom"), colo
     label.italic = italic
     (label.anchor_x, label.anchor_y) = anchor
     label.x, label.y = position
-    if ui: _set_view_ui()
-    else: _set_view_ortho()
-    label.draw()
-    if ui: _set_view_ortho()
-
-def get_camera():
-    global _ctx
-    if _ctx._win is None:
-        raise EasyGameError('window not open')
-    return _ctx._camera
+    # if not ui: label.draw()
 
 def set_camera(center=None, position=None, rotation=None, zoom=None):
     """Set properties of the camera. Only properties you set will be changed.
