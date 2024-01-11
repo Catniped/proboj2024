@@ -5,6 +5,12 @@ window = easygame.open_window('window', None, None, True, resizable=True)
 def testCallback(button):
     print(button)
 
+
+#docasne variables
+cooldown = 0
+arrows = []
+############
+
 mapi = easygame.load_image("Assets/Tileset/map.png")
 offset = -(mapi.width*0.2 - window.width*2)
 group1 = uihelper.uiGroup()
@@ -62,7 +68,15 @@ while not should_quit:
         if uihelper.placeTower(tower,mousex,mousey,downl):
             placetower = False        
             tower = None
-    
+
+#arrow logic
+    if cooldown == 30:
+        arrows.append([100,100],uihelper.archerTowerElement.target([10,10],10,[20,20]))
+    for arrow in arrows:
+        uihelper.archerTowerElement.move_arrow(arrow[0],arrow[1])
+
+    cooldown += 1
+
     group1.renderGroup(window)
     group3.renderGroup(window)
     group2.renderGroup(window)

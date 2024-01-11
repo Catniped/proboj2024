@@ -112,7 +112,7 @@ class enemyElement:
             self.velocity = (self.speed if rx < x else -self.speed, ys if ry < y else ys)
 
 class archerTowerElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=100):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=30, radius=100):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -139,7 +139,8 @@ class archerTowerElement:
         target = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
         return target
     def move_arrow(self,pos,target):
-        pos += target/30
+        pos[0] += target[0]/30
+        pos[1] += target[1]/30
         return pos
     
 class mageTowerElement:
