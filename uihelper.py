@@ -129,22 +129,18 @@ class archerTowerElement:
         self.visible = True
         self.callback = callback
         self.ui = ui
-
         self.damage = damage
         self.speed = speed
         self.radius = radius
 
         group.elements.append(self)
 
-    def shoot(self,enemyxy,enemyspeed,enemyvector):
+    def target(self,enemyxy,enemyspeed,enemyvector):
         target = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
-        vector = easygame.rotate(vector,easygame.degrees(6))/numpy.linalg.norm(vector)
-        return vector
-    
-    def projectile(position):
-        vector = easygame.rotate(vector,easygame.degrees(6))/numpy.linalg.norm(vector)
-        position += vector
-        return position
+        return target
+    def move_arrow(self,pos,target):
+        pos += target/30
+        return pos
     
 class mageTowerElement:
     def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
