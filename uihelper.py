@@ -125,24 +125,44 @@ class archerTowerElement:
         self.scale_y = scale_y
         self.opacity = opacity
         self.pixelated = pixelated
-        self.enabled = True
+        self.enabled = False
         self.visible = True
         self.callback = callback
         self.ui = ui
+
         self.damage = damage
         self.speed = speed
         self.radius = radius
+        self.cooldown = 0
+        self.target = None
 
         group.elements.append(self)
+    
+    def cooldownCheck(self, enemygroup):
+        if self.cooldown > 0:
+            self.cooldown-=1
+        else:
+            if self.enabled:
+                if self.target:
+                    self.target.opacity = 0.1
+                else:
+                    for enemy in enemygroup.elements:
+                        ex,ey = enemy.position
+                        px,py = self.position
 
-    def target(self,enemyxy,enemyspeed,enemyvector):
-        target = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
-        return target
+                        if (ex - px)**2 + (ey - py)**2 < self.radius**2:
+                            self.target = enemy
+                            break
+
+
+    """def target(self,enemyxy,enemyspeed,enemyvector):
+        terminalpos = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
+        return terminalpos
     
     def move_arrow(self,pos,target):
         pos[0] += target[0]/30
         pos[1] += target[1]/30
-        return pos
+        return pos"""
     
 class mageTowerElement:
     def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
@@ -182,6 +202,7 @@ def placeTower(tower, mousex, mousey, down):
     easygame.draw_circle((mousex,mousey),tower.radius,color=(1,0,0,0.2))
     if down:
         tower.opacity = 1
+        tower.enabled = True
         return True
     return False
 
