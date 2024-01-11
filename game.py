@@ -1,4 +1,4 @@
-import easygame, uihelper
+import easygame, uihelper, pyglet
 
 window = easygame.open_window('window', None, None, True)
 
@@ -9,7 +9,7 @@ mapi = easygame.load_image("Assets/Tileset/map.png")
 offset = -(mapi.width*0.2 - window.width*2)
 group1 = uihelper.uiGroup()
 group2 = uihelper.uiGroup()
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=group1,callback=testCallback,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=group1,scale=2,callback=testCallback,ui=True)
 enemy = uihelper.enemyElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(1362,495),group=group2,scale=0.3)
 
 """
@@ -51,6 +51,7 @@ while not should_quit:
 
     easygame.fill(0.200, 0.230, 0.245)
     uihelper.drawCentered(mapi,scale=0.15,position=(offset,0),window=window)
+    easygame.draw_text("test","arial",40,ui=True)
     group1.renderGroup(window)
 
     """ex, ey = enemy.position 

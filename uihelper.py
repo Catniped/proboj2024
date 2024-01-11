@@ -1,4 +1,5 @@
 from easygame import draw_image, load_sheet, draw_circle
+from math import isclose
 
 class uiGroup:
     """Object which groups together multiple UI Elements (images) and manages their rendering and callbacks"""
@@ -65,7 +66,7 @@ class uiElement:
 
 class enemyElement:
     """Image used in the UI"""
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, health=10, ):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, health=10, speed=1):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -84,10 +85,10 @@ class enemyElement:
         self.ui = ui
 
         self.health = health
-        self.speed = 1
+        self.speed = speed
         self.routeto = None
         self.velocity = (0,0)
-        self.waypoints = [(1020, 300)]
+        self.waypoints = [(1020, 300),(594,540),(731,615),(595,693)]
 
         group.elements.append(self)
     
@@ -98,13 +99,16 @@ class enemyElement:
         x,y = self.position
         if self.routeto:
             rx,ry = self.routeto
-            if x > rx and y > ry:
+            if not isclose(x, rx, abs_tol=2) and not isclose(y, ry, abs_tol=2):
                 xv, yv = self.velocity
                 self.position = (x-xv,y-yv)
-        elif self.waypoints[0]:
+            else:
+                self.routeto = None
+        elif self.waypoints:
             self.routeto = self.waypoints.pop(0)
             rx,ry = self.routeto
-            self.velocity = (self.speed,((ry - y)/(rx - x))*self.speed)
+            ys = ((ry - y)/-abs(rx - x))*self.speed
+            self.velocity = (self.speed if rx < x else -self.speed, ys if ry < y else ys)
 
 
 """def loadSheetOOP(path, frame_width, frame_height, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None):

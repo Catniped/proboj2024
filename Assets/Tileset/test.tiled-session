@@ -12,6 +12,10 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "cactus2_200x308.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
         "crystal(3).tsx": {
             "scaleInDock": 1,
             "scaleInEditor": 1
@@ -27,8 +31,8 @@
             "scale": 0.125,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 8348,
-                "y": 1464
+                "x": 8408,
+                "y": 4896
             }
         },
         "road_desert(1).tsx": {
@@ -76,7 +80,7 @@
             "scaleInEditor": 1
         }
     },
-    "last.imagePath": "D:/My Documents/GitHub/proboj2024/Assets/Sprites/Enviroument tiles",
+    "last.imagePath": "D:/My Documents/GitHub/proboj2024/Assets/Sprites/Enviroument tiles/Desert biome/cactuses",
     "map.fixedSize": true,
     "map.height": 32,
     "map.lastUsedFormat": "tmx",
@@ -88,10 +92,12 @@
         "map.tmx",
         "road_desert(9).tsx",
         "road_desert(1).tsx",
-        "crystal(3).tsx"
+        "crystal(3).tsx",
+        "cactus2_200x308.tsx"
     ],
     "project": "test.tiled-project",
     "recentFiles": [
+        "cactus2_200x308.tsx",
         "crystal(3).tsx",
         "road_desert(1).tsx",
         "road_desert(9).tsx",
@@ -102,12 +108,11 @@
         "road_spring(11).tsx",
         "snow.tsx",
         "road_spring(1).tsx",
-        "archer_level_1_256x327.tsx",
-        "stone2.tsx"
+        "archer_level_1_256x327.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
-        "height": 143,
-        "width": 121
+        "height": 308,
+        "width": 200
     }
 }
