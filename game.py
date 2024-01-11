@@ -1,6 +1,6 @@
 import easygame, uihelper, pyglet
 
-window = easygame.open_window('window', None, None, True, resizable=True)
+window = easygame.open_window('window', None, None, False, resizable=True)
 
 def testCallback(button):
     print(button)
@@ -21,6 +21,7 @@ downl = False
 fullscreen = True
 should_quit = False
 while not should_quit:
+    camera=easygame.get_camera()
     for event in easygame.poll_events():
         evtype = type(event)
         if evtype is easygame.CloseEvent:
@@ -46,7 +47,8 @@ while not should_quit:
                 fullscreen = not fullscreen
                 window.set_fullscreen(fullscreen)
             elif event.key == "E":
-                tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(0,0),group=group3,scale=0.3)
+                print("pos", mousex, camera.position)
+                tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=group3,scale=0.3)
                 placetower = True
         elif evtype is easygame.MouseScrollEvent:
             if event.scroll_y > 0:
@@ -59,8 +61,8 @@ while not should_quit:
 
     enemy.move()
     if placetower:
-        if uihelper.placeTower(tower,mousex,mousey,downl):
-            placetower = False        
+        if uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downl):
+            placetower = False
             tower = None
     
     group1.renderGroup(window)

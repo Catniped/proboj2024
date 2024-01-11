@@ -649,6 +649,12 @@ def draw_text(text, font, size, position=(0, 0), anchor=("left", "bottom"), colo
     label.x, label.y = position
     if not ui: label.draw()
 
+def get_camera():
+    global _ctx
+    if _ctx._win is None:
+        raise EasyGameError('window not open')
+    return _ctx._camera
+
 def set_camera(center=None, position=None, rotation=None, zoom=None):
     """Set properties of the camera. Only properties you set will be changed.
 
