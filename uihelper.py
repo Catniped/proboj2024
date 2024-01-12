@@ -1,6 +1,10 @@
 from easygame import draw_image, draw_text
 import easygame, numpy
 from math import isclose
+# from game import Scale
+
+x_scale=0
+y_scale=0
 
 class uiGroup:
     """Object which groups together multiple UI Elements (images) and manages their rendering and callbacks"""
@@ -139,8 +143,12 @@ class enemyElement:
             else:
                 self.routeto = None
         elif self.waypoints:
-            self.routeto = self.waypoints.pop(0)
-            rx,ry = self.routeto
+            rx, ry = self.waypoints.pop(0)
+            # self.routeto = self.waypoints.pop(0)
+            # rx,ry = self.routeto
+            # rx*=x_scale
+            # ry*=y_scale
+            self.routeto=(rx, ry)
             ys = ((ry - y)/-abs(rx - x))*self.speed
             self.velocity = (self.speed if rx < x else -self.speed, ys if ry < y else ys)
 

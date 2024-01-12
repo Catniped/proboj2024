@@ -1,4 +1,43 @@
-import easygame, uihelper, pyglet, time
+import easygame, uihelper, pyglet
+
+window = easygame.open_window('window', 1600, 900, False, resizable=False)
+
+res_scale_x=(window.width/1600)
+res_scale_y=(window.height/900)
+
+uihelper.x_scale=res_scale_x
+uihelper.y_scale=res_scale_y
+
+def testCallback(button):
+    uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3,health=100)
+
+mapi = easygame.load_image("Assets/Tileset/map.png")
+# offset = (window.width - mapi.width) / 2
+offset = -(mapi.width*0.2 - window.width*2)
+
+
+print(offset, window.width/1600)
+# offset = offset*res_scale_x
+print(offset)
+
+# if (offset > window.width/2):
+#     offsetX = -(mapi.width - window.width/2)
+# elif (offset + mapi.width < window.width/2):
+#     offsetX = window.width/2 - (offset + mapi.width)
+
+# if (mapi.center[0] > window.width/2):
+#     offsetX = (mapi.center[0] - window.width/2)
+#     print("hi", offsetX)
+# elif (mapi.center[0] + mapi.width < window.width/2):
+#     offsetX = window.width/2 - (mapi.center[0] + mapi.width)
+#     print("hi2")
+
+ui1 = uihelper.uiGroup()
+enemies = uihelper.uiGroup()
+towers = uihelper.uiGroup()
+projectiles = uihelper.uiGroup()
+
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=testCallback,ui=True)
 
 balance = 1000
 cooldown = 0
@@ -75,8 +114,8 @@ while not should_quit:
             else:
                 downl = False
         elif evtype is easygame.MouseMoveEvent:
-            mousex = event.x
-            mousey = event.y
+            mousex = event.x-camera.position[0]
+            mousey = event.y-camera.position[1]
             if downrm:
                 easygame.move_camera((-event.dx,-event.dy))
         elif evtype is easygame.KeyDownEvent:
