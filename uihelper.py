@@ -1,6 +1,6 @@
-from easygame import draw_image, draw_text
+from easygame import draw_image, draw_text, draw_circle
 import easygame, numpy
-from math import isclose, atan
+from math import isclose, atan2, pi
 
 x_scale=0
 y_scale=0
@@ -34,10 +34,16 @@ class uiGroup:
         """Renders all elements in UI Group, only considers parent group visibility"""
         if self.visible:
             for element in self.elements:
-                if type(element) != textElement:
+                if type(element) in [uiElement,enemyElement,mageTowerElement,projectileElement,archerTowerElement]:
                     draw_image(element.image, element.position, element.anchor, element.rotation, element.scale, element.scale_x, element.scale_y, element.opacity, element.pixelated, element.ui)
                 elif type(element) == textElement:
                     draw_text(element.text, element.font, element.size, element.position, element.anchor, element.color, element.bold, element.italic, element.ui)
+                elif type(element) == circleElement:
+                    element.lifetime-=1
+                    if element.lifetime: 
+                        draw_circle(element.center,element.radius,element.color,element.ui) 
+                    else: 
+                        self.kill(element)
 
     def checkGroup(self, event):
         """Checks whether an element in the group was clicked by the event passed, if true activates callback of the element"""
@@ -81,7 +87,6 @@ class uiElement:
         self.callback(button)
 
 class textElement:
-    """Image used in the UI"""
     def __init__(self, text, font, size, position=(0, 0), anchor=("left", "bottom"), color=(1, 1, 1, 1), bold=False, italic=False, ui=False, group=uiGroup, visible=True):
         self.text = text
         self.font = font
@@ -93,6 +98,20 @@ class textElement:
         self.italic = italic
         self.ui = ui
         self.visible = visible
+
+        group.elements.append(self)
+    
+    def clicked(self, button):
+        self.callback(button)
+
+class circleElement:
+    def __init__(self, center=(0,0), radius=100, color=(1,1,1,1), ui=False, group=uiGroup, lifetime=10):
+        self.center = center
+        self.radius = radius
+        self.color = color
+        self.ui = ui
+
+        self.lifetime = lifetime
 
         group.elements.append(self)
     
@@ -151,7 +170,7 @@ class enemyElement:
             self.velocity = (self.speed if rx < x else -self.speed, ys if ry < y else ys)
 
 class archerTowerElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=30, radius=100, price=100):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=8, speed=30, radius=100, price=100):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -176,14 +195,13 @@ class archerTowerElement:
         self.cooldown = 0
         self.target = None
         self.arrows = []
-        self.FPS = 60
-
         self.arrowcache = easygame.load_image("Assets/Sprites/Towers/Archer/arrow.png")
 
         group.elements.append(self)
     
     def cooldownCheck(self, enemygroup, projectilegroup):
         for arrow in self.arrows:
+            arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),"""INSERT ENEMY VELOCITY""")).
             return arrow.tick(self.target, enemygroup, projectilegroup, self)
         if self.cooldown > 0:
             self.cooldown-=1
@@ -194,17 +212,18 @@ class archerTowerElement:
                     self.arrows.append(projectileElement(self.arrowcache,(self.position[0],self.position[1]),group=projectilegroup,damage=self.damage)) 
                 else:
                     for enemy in enemygroup.elements:
-                        ex,ey = enemy.position
+                        self.ex,self.ey = enemy.position
                         px,py = self.position
 
-                        if (ex - px)**2 + (ey - py)**2 < self.radius**2:
+                        if (self.ex - px)**2 + (self.ey - py)**2 < self.radius**2:
                             self.target = enemy
                             break
 
 
-    def target(self,enemyxy,enemyspeed):
-        velocity = ((enemyxy[0] + enemyspeed[0] * self.speed, enemyxy[1] + enemyspeed[1] * self.speed) - self.position)/self.speed
-        return velocity
+    def get_velocity(self,enemyxy,enemyspeed):
+        velocity1 = (enemyxy[0] + enemyspeed[0] * self.speed - self.position[0])/self.speed
+        velocity2 = (enemyxy[1] + enemyspeed[1] * self.speed - self.position[1])/self.speed
+        return (velocity1, velocity2)
     
     def kill(self, obj):
         try:
@@ -239,13 +258,14 @@ class projectileElement:
 
         group.elements.append(self)
 
-    def move_arrow(self,pos,target):
-        pos[0] += target[0]/self.FPS
-        pos[1] += target[1]/self.FPS
+    def move_arrow(self,pos):
+        pos[0] += self.velocity
+        pos[1] += self.velocity
         return pos
     
     def rotate_arrow(self,velocity):
-        self.rotation = atan(velocity[1]/velocity[0])
+        self.rotation = atan2(velocity[0],velocity[1]) #- pi/2
+        print(self.rotation)
 
     def tick(self, enemy, enemygroup, projectilegroup, tower):
         if self.lifetime < self.maxlifetime:
@@ -262,7 +282,7 @@ class projectileElement:
             tower.kill(self)
 
 class mageTowerElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=3, speed=60, radius=100, price=100, attackradius=50):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -275,7 +295,7 @@ class mageTowerElement:
         self.scale_y = scale_y
         self.opacity = opacity
         self.pixelated = pixelated
-        self.enabled = True
+        self.enabled = False
         self.visible = True
         self.callback = callback
         self.ui = ui
@@ -283,24 +303,73 @@ class mageTowerElement:
         self.damage = damage
         self.speed = speed
         self.radius = radius
-        
+        self.attackradius = attackradius
+        self.price = price
+        self.cooldown = 0
+        self.target = None
+        self.targetprevloc = ()
+        self.FPS = 60
+
         group.elements.append(self)
-        
-    def shoot(self,enemyxy):
-        self.placement += enemyxy[0] - self.placement[0],enemyxy[1] - self.placement[1]
+    
+    def cooldownCheck(self, enemygroup, projectilesgroup):
+        if self.cooldown > 0:
+            self.cooldown-=1
+        else:
+            if self.enabled:
+                if self.target:
+                    if self.target.position == self.targetprevloc:
+                        self.target = None
+                        return 0
+                    else:
+                        self.targetprevloc = self.target.position
+                    px,py = self.target.position
+                    circleElement((px,py),self.attackradius,(0.188, 0.066, 0.245, 0.6),group=projectilesgroup,lifetime=30)
+                    resettarget = False
+                    kc = 0
+                    self.cooldown = self.speed
+                    for enemy in enemygroup.elements:
+                        ex,ey = enemy.position
+                        if (ex - px)**2 + (ey - py)**2 < self.attackradius**2:
+                            enemy.health-=self.damage
+                        if enemy.health <= 0:
+                            i = enemy
+                            r = i.reward
+                            if enemy == self.target:
+                                resettarget = True
+                            if enemygroup.kill(i): kc+=r
+                    if resettarget:
+                        self.target = None
+                    return kc
+
+                else:
+                    for enemy in enemygroup.elements:
+                        ex,ey = enemy.position
+                        px,py = self.position
+
+                        if (ex - px)**2 + (ey - py)**2 < self.radius**2:
+                            self.target = enemy
+                            break
+    
+    def kill(self, obj):
+        try:
+            self.arrows.remove(obj)
+            return True
+        except ValueError:
+            return False
 
 """def loadSheetOOP(path, frame_width, frame_height, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None):
     for i in load_sheet(path, frame_width, frame_height):
         yield(uiElement(i, position, anchor, rotation, scale, scale_x, scale_y, opacity, pixelated, group, callback))"""
 
-def placeTower(tower, umousex, umousey, down):
+def placeTower(tower, umousex, umousey, down, balance):
     scale = easygame.get_camera().zoom
     mousex = umousex/scale
     mousey = umousey/scale
     tower.position = (mousex,mousey)
     tower.opacity = 0.8
     easygame.draw_circle((mousex,mousey),tower.radius,color=(1,0,0,0.2))
-    if down:
+    if down and balance >= tower.price:
         tower.opacity = 1
         tower.enabled = True
         return True
