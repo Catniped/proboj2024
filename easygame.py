@@ -418,6 +418,7 @@ def next_frame():
     dt = pyglet.clock.tick()
     if dt < 1 / _ctx._fps:
         time.sleep(1/_ctx._fps - dt)
+    pyglet.app.platform_event_loop.dispatch_posted_events()
 
 def fill(r, g, b):
     """Fill the whole window with a single color.
