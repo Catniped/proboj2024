@@ -20,7 +20,7 @@ damageUpgradePrice = 1000
 speedUpgrade = 1
 speedUpgradePrice = 1000
 
-window = easygame.open_window('window', 1600, 900, False, resizable=False)
+window = easygame.open_window('window', 1600, 900, False, resizable=True)
 
 def spawnEnemies():
     chanceModifier = round(DIFFICULTY/difficultyModifier*2,0)
@@ -99,19 +99,19 @@ playIconClick = easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/P
 cartIcon = uihelper.uiElement(cartIconIdle,(50,window.height-105),group=ui1,scale=1,callback=toggleShop,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(window.width-150,window.height-105),group=ui1,scale=1,enabled=False,ui=True)
 """uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)"""
-BALANCEDisplay = uihelper.textElement(str(BALANCE),"Poppins",30,(window.width-135,window.height-96),ui=True,group=ui1)
+BALANCEDisplay = uihelper.textElement(str(BALANCE),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
 
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,595),group=shopui,scale=1,enabled=False,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,660),group=shopui,scale=1.1,enabled=True,callback=buyArcherTower,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(475,660),group=shopui,scale=1.1,enabled=True,callback=buyMageTower,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Barrack/sword.png"),(715,665),group=shopui,scale=2.5,enabled=True,callback=buyDamageUpgrade,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/bow_animation(3).png"),(900,665),group=shopui,scale=2.5,enabled=True,callback=buySpeedUpgrade,ui=True)
-archerPriceDisplay = uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((315,610)),ui=True,group=shopui)
-magePriceDisplay = uihelper.textElement(str(200*difficultyModifier),"Poppins",30,((515,610)),ui=True,group=shopui)
-damageUpgradePriceDisplay = uihelper.textElement(str(damageUpgradePrice),"Poppins",30,((705,610)),ui=True,group=shopui)
-damageUpgradeDisplay = uihelper.textElement(str(damageUpgrade) + "x","Poppins",30,((730,775)),ui=True,group=shopui)
-speedUpgradePriceDisplay = uihelper.textElement(str(speedUpgradePrice),"Poppins",30,((905,610)),ui=True,group=shopui)
-speedUpgradeDisplay = uihelper.textElement(str(speedUpgrade) + "x","Poppins",30,((920,775)),ui=True,group=shopui)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,window.height-305),group=shopui,scale=1*x_scale,enabled=False,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyArcherTower,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(475,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyMageTower,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Barrack/sword.png"),(715,window.height-235),group=shopui,scale=2.5*x_scale,enabled=True,callback=buyDamageUpgrade,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/bow_animation(3).png"),(900,window.height-235),group=shopui,scale=2.5*x_scale,enabled=True,callback=buySpeedUpgrade,ui=True)
+archerPriceDisplay = uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((315,window.height-290)),ui=True,group=shopui)
+magePriceDisplay = uihelper.textElement(str(200*difficultyModifier),"Poppins",30,((515,window.height-290)),ui=True,group=shopui)
+damageUpgradePriceDisplay = uihelper.textElement(str(damageUpgradePrice),"Poppins",30,((705,window.height-290)),ui=True,group=shopui)
+damageUpgradeDisplay = uihelper.textElement(str(damageUpgrade) + "x","Poppins",30,((730,window.height-125)),ui=True,group=shopui)
+speedUpgradePriceDisplay = uihelper.textElement(str(speedUpgradePrice),"Poppins",30,((905,window.height-290)),ui=True,group=shopui)
+speedUpgradeDisplay = uihelper.textElement(str(speedUpgrade) + "x","Poppins",30,((920,window.height-125)),ui=True,group=shopui)
 
 
 while not should_quit:
