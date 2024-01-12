@@ -2,7 +2,7 @@
 Je to hra na proboj, ktorý sa konal 12.1.2024 vo Floriho chate pri Bardejove.
 
 # Pred inštaláciou
-Na spustenie je portebné mať nainštalované tieto veci:
+Na spustenie je potrebné mať nainštalované tieto veci:
 - Python (minimálna verzia 3.11)
 - pip
 
@@ -11,6 +11,8 @@ Na spustenie je portebné mať nainštalované tieto veci:
 ```
 git clone https://github.com/Catniped/proboj2024.git
 ```
+https://github.com/github/codeql/archive/refs/heads/main.tar.gz
+  alebo si stiahni [ZIP súbor](https://github.com/Catniped/proboj2024/zipball/main)
 2. Nainštaluj si potrebné knižnice cez pip.
 ```
 pip install -r requirements.txt
