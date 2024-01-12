@@ -14,17 +14,14 @@ tower = None
 placetower = False
 killcounter = 0
 
-window = easygame.open_window('window', 1600, 900, fullscreen=fullscreen, resizable=True)
-
-@window.event
-def on_resize(width, height):
-    global x_scale, y_scale
-    x_scale=width/1600
-    y_scale=height/900
+window = easygame.open_window('window', 1600, 900, fullscreen=fullscreen, resizable=False)
 
 
 x_scale=window.width/1600
 y_scale=window.height/900
+
+def spawnTestEnemy(buttons):
+    uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3)
 
 def toggleShop(buttons):
     if not shopui.enabled:
@@ -58,9 +55,12 @@ projectiles = uihelper.uiGroup()
 cartIconIdle = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Idle.png")
 cartIconActive = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Click.png")
 
+
 cartIcon = uihelper.uiElement(cartIconIdle,(50,window.height-105),group=ui1,scale=1,callback=toggleShop,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(window.width-150,window.height-105),group=ui1,scale=1,enabled=False,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)
 balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
+
 
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225*x_scale,window.height-305),group=shopui,scale=1*x_scale,enabled=False,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyTower,ui=True)
@@ -124,7 +124,7 @@ while not should_quit:
             tower = None
 
     for tower in towers.elements:
-        r=tower.cooldownCheck(enemies, balance)
+        r=tower.cooldownCheck(enemies, projectiles)
         if r:
             killcounter+=1
             balance+=r
@@ -134,6 +134,7 @@ while not should_quit:
     """rendering"""
     towers.renderGroup(window)
     enemies.renderGroup(window)
+    projectiles.renderGroup(window)
     ui1.renderGroup(window)
     shopui.renderGroup(window)
     easygame.next_frame()

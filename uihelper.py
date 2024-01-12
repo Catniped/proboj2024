@@ -1,7 +1,6 @@
 from easygame import draw_image, draw_text
 import easygame, numpy
-from math import isclose
-# from game import Scale
+from math import isclose, atan
 
 x_scale=0
 y_scale=0
@@ -55,7 +54,6 @@ class uiGroup:
             return True
         except ValueError:
             return False
-
 
 class uiElement:
     """Image used in the UI"""
@@ -166,7 +164,7 @@ class archerTowerElement:
         self.scale_y = scale_y
         self.opacity = opacity
         self.pixelated = pixelated
-        self.enabled = True
+        self.enabled = False
         self.visible = True
         self.callback = callback
         self.ui = ui
@@ -177,23 +175,23 @@ class archerTowerElement:
         self.price = price
         self.cooldown = 0
         self.target = None
+        self.arrows = []
+        self.FPS = 60
+
+        self.arrowcache = easygame.load_image("Assets/Sprites/Towers/Archer/arrow.png")
 
         group.elements.append(self)
     
     def cooldownCheck(self, enemygroup, projectilegroup):
+        for arrow in self.arrows:
+            return arrow.tick(self.target, enemygroup, projectilegroup, self)
         if self.cooldown > 0:
             self.cooldown-=1
         else:
             if self.enabled:
                 if self.target:
-                    self.target.health-=self.damage
-                    if self.target.health <= 0:
-                        self.target.opacity = 0.8
-                        i = self.target
-                        r = i.reward
-                        self.target = None
-                        if enemygroup.kill(i): return r
                     self.cooldown = self.speed
+                    self.arrows.append(projectileElement(self.arrowcache,(self.position[0],self.position[1]),group=projectilegroup,damage=self.damage)) 
                 else:
                     for enemy in enemygroup.elements:
                         ex,ey = enemy.position
@@ -208,10 +206,15 @@ class archerTowerElement:
         velocity = ((enemyxy[0] + enemyspeed[0] * self.speed, enemyxy[1] + enemyspeed[1] * self.speed) - self.position)/self.speed
         return velocity
     
-
-
+    def kill(self, obj):
+        try:
+            self.arrows.remove(obj)
+            return True
+        except ValueError:
+            return False
+    
 class projectileElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, velocity = (0,0)):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, velocity=(0,0), damage=10):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -230,13 +233,33 @@ class projectileElement:
         self.ui = ui
 
         self.velocity = velocity
+        self.damage = damage
+        self.lifetime = 0
+        self.maxlifetime = 60
 
         group.elements.append(self)
 
-    def move_arrow(self):
-        self.position[0] += self.velocity[0]
-        self.position[1] += self.velocity[1]
-        return self.position
+    def move_arrow(self,pos,target):
+        pos[0] += target[0]/self.FPS
+        pos[1] += target[1]/self.FPS
+        return pos
+    
+    def rotate_arrow(self,velocity):
+        self.rotation = atan(velocity[1]/velocity[0])
+
+    def tick(self, enemy, enemygroup, projectilegroup, tower):
+        if self.lifetime < self.maxlifetime:
+            self.lifetime+=1
+        else:
+            if enemy:
+                enemy.health-=self.damage
+                if enemy.health <= 0:
+                    i = enemy
+                    r = i.reward
+                    tower.target = None
+                    if enemygroup.kill(i): return r
+            projectilegroup.kill(self)
+            tower.kill(self)
 
 class mageTowerElement:
     def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
