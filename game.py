@@ -16,6 +16,9 @@ killcounter = 0
 
 window = easygame.open_window('window', 1600, 900, False, resizable=False)
 
+def spawnTestEnemy(buttons):
+    uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3)
+
 def toggleShop(buttons):
     if not shopui.enabled:
         cartIcon.image = cartIconActive
@@ -49,6 +52,7 @@ cartIconActive = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blu
 
 cartIcon = uihelper.uiElement(cartIconIdle,(50,795),group=ui1,scale=1,callback=toggleShop,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(1450,795),group=ui1,scale=1,enabled=False,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)
 balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(1469,804),ui=True,group=ui1)
 
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,595),group=shopui,scale=1,enabled=False,ui=True)
@@ -113,7 +117,7 @@ while not should_quit:
             tower = None
 
     for tower in towers.elements:
-        r=tower.cooldownCheck(enemies, balance)
+        r=tower.cooldownCheck(enemies, projectiles)
         if r:
             killcounter+=1
             balance+=r
@@ -123,6 +127,7 @@ while not should_quit:
     """rendering"""
     towers.renderGroup(window)
     enemies.renderGroup(window)
+    projectiles.renderGroup(window)
     ui1.renderGroup(window)
     shopui.renderGroup(window)
     easygame.next_frame()
