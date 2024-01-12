@@ -20,7 +20,7 @@ damageUpgradePrice = 1000
 speedUpgrade = 1
 speedUpgradePrice = 1000
 
-window = easygame.open_window('window', 1600, 900, False, resizable=True)
+window = easygame.open_window('Rieka', 1600, 900, False, resizable=True)
 
 def spawnEnemies():
     chanceModifier = round(DIFFICULTY/difficultyModifier*2,0)
