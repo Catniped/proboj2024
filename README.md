@@ -11,7 +11,6 @@ Na spustenie je potrebné mať nainštalované tieto veci:
 ```
 git clone https://github.com/Catniped/proboj2024.git
 ```
-https://github.com/github/codeql/archive/refs/heads/main.tar.gz
   alebo si stiahni [ZIP súbor](https://github.com/Catniped/proboj2024/zipball/main)
 2. Nainštaluj si potrebné knižnice cez pip.
 ```
