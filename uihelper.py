@@ -1,6 +1,6 @@
 from easygame import draw_image, draw_text
 import easygame, numpy
-from math import isclose, atan
+from math import isclose, atan2, pi
 
 x_scale=0
 y_scale=0
@@ -182,7 +182,7 @@ class archerTowerElement:
     
     def cooldownCheck(self, enemygroup, projectilegroup):
         for arrow in self.arrows:
-            arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),(1,1)))
+            arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),"""INSERT ENEMY VELOCITY""")).
             return arrow.tick(self.target, enemygroup, projectilegroup, self)
         if self.cooldown > 0:
             self.cooldown-=1
@@ -245,7 +245,8 @@ class projectileElement:
         return pos
     
     def rotate_arrow(self,velocity):
-        self.rotation = atan(velocity[1]/velocity[0])
+        self.rotation = atan2(velocity[0],velocity[1]) #- pi/2
+        print(self.rotation)
 
     def tick(self, enemy, enemygroup, projectilegroup, tower):
         if self.lifetime < self.maxlifetime:
