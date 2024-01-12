@@ -5,5 +5,4 @@
 - [x] uis
 - [x] hudba
 - [x] bomba
-- [x] prehra
-- [ ] playtest
+- [ ] prehra
