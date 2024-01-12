@@ -4,5 +4,5 @@
 - [x] projectile physics
 - [x] uis
 - [x] hudba
-- [ ] bomba
+- [x] bomba
 - [ ] prehra
