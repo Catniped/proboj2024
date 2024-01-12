@@ -196,8 +196,8 @@ class archerTowerElement:
 
 
     def target(self,enemyxy,enemyspeed):
-        terminalpos = (enemyxy[0] + enemyspeed[0] * self.FPS , enemyxy[1] + enemyspeed[1] * self.FPS)
-        return terminalpos
+        velocity = ((enemyxy[0] + enemyspeed[0] * self.speed, enemyxy[1] + enemyspeed[1] * self.speed) - self.position)/self.speed
+        return velocity
     
     def kill(self, obj):
         try:

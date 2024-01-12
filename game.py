@@ -1,4 +1,4 @@
-import easygame, uihelper, pyglet, time
+import easygame, uihelper, pyglet
 
 balance = 1000
 cooldown = 0
