@@ -201,7 +201,8 @@ class archerTowerElement:
     
     def cooldownCheck(self, enemygroup, projectilegroup, dmgMultiplier, speedMultiplier):
         for arrow in self.arrows:
-            arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),"""INSERT ENEMY VELOCITY"""))
+            if self.target:
+                arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),self.target.velocity))
             return arrow.tick(self.target, enemygroup, projectilegroup, self, dmgMultiplier)
         if self.cooldown > 0:
             self.cooldown-=1
@@ -265,7 +266,6 @@ class projectileElement:
     
     def rotate_arrow(self,velocity):
         self.rotation = atan2(velocity[0],velocity[1]) #- pi/2
-        print(self.rotation)
 
     def tick(self, enemy, enemygroup, projectilegroup, tower, dmgMultiplier):
         if self.lifetime < self.maxlifetime:
@@ -362,14 +362,14 @@ class mageTowerElement:
     for i in load_sheet(path, frame_width, frame_height):
         yield(uiElement(i, position, anchor, rotation, scale, scale_x, scale_y, opacity, pixelated, group, callback))"""
 
-def placeTower(tower, umousex, umousey, down, balance):
+def placeTower(tower, umousex, umousey, down, BALANCE):
     scale = easygame.get_camera().zoom
     mousex = umousex/scale
     mousey = umousey/scale
     tower.position = (mousex,mousey)
     tower.opacity = 0.8
     easygame.draw_circle((mousex,mousey),tower.radius,color=(1,0,0,0.2))
-    if down and balance >= tower.price:
+    if down and BALANCE >= tower.price:
         tower.opacity = 1
         tower.enabled = True
         return True

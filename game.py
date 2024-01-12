@@ -1,6 +1,7 @@
 import easygame, uihelper, pyglet, random
 
-balance = 1000
+DIFFICULTY = 25
+BALANCE = 1000
 cooldown = 0
 arrows = []
 mousex = (0,0)
@@ -22,7 +23,7 @@ speedUpgradePrice = 1000
 window = easygame.open_window('window', 1600, 900, False, resizable=True)
 
 def spawnEnemies():
-    chanceModifier = round(35/difficultyModifier*2,0)
+    chanceModifier = round(DIFFICULTY/difficultyModifier*2,0)
     if not random.randint(0,chanceModifier):
         uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3,reward=5*difficultyModifier*1.5,health=5*difficultyModifier*3)
 
@@ -49,20 +50,20 @@ def buyMageTower(buttons):
     placetower = True
 
 def buyDamageUpgrade(buttons):
-    global balance
+    global BALANCE
     global damageUpgradePrice
     global damageUpgrade
-    if balance >= damageUpgradePrice:
-        balance-=damageUpgradePrice
+    if BALANCE >= damageUpgradePrice:
+        BALANCE-=damageUpgradePrice
         damageUpgradePrice*=2
         damageUpgrade+=0.1
 
 def buySpeedUpgrade(buttons):
-    global balance
+    global BALANCE
     global speedUpgradePrice
     global speedUpgrade
-    if balance >= speedUpgradePrice:
-        balance-=speedUpgradePrice
+    if BALANCE >= speedUpgradePrice:
+        BALANCE-=speedUpgradePrice
         speedUpgradePrice*=2
         speedUpgrade*=0.9
     
@@ -98,16 +99,7 @@ playIconClick = easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/P
 cartIcon = uihelper.uiElement(cartIconIdle,(50,window.height-105),group=ui1,scale=1,callback=toggleShop,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(window.width-150,window.height-105),group=ui1,scale=1,enabled=False,ui=True)
 """uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)"""
-balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
-
-
-"""
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,window.height-305),group=shopui,scale=1*x_scale,enabled=False,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyArcherTower,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(475,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyMageTower,ui=True)
-uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((315,window.height-290)),ui=True,group=shopui)
-
-"""
+BALANCEDisplay = uihelper.textElement(str(BALANCE),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
 
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,window.height-305),group=shopui,scale=1*x_scale,enabled=False,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyArcherTower,ui=True)
@@ -175,8 +167,8 @@ while not should_quit:
             towers.kill(tower)
             placetower = False
             tower = None
-        elif uihelper.placeTower(tower,mousex+camera.position[0]*2,mousey+camera.position[1]*2,downrm,balance):
-            balance-=tower.price
+        elif uihelper.placeTower(tower,mousex+camera.position[0]*2,mousey+camera.position[1]*2,downrm,BALANCE):
+            BALANCE-=tower.price
             placetower = False
             tower = None
 
@@ -184,11 +176,11 @@ while not should_quit:
         r=tower.cooldownCheck(enemies, projectiles, damageUpgrade, speedUpgrade)
         if r:
             killcounter+=1
-            balance+=r
+            BALANCE+=r
         
     difficultyModifier = 1+killcounter/2000
 
-    balanceDisplay.text = str(round(balance,1))
+    BALANCEDisplay.text = str(round(BALANCE,1))
     archerPriceDisplay.text = str(round(100*difficultyModifier,1))
     magePriceDisplay.text = str(round(200*difficultyModifier,1))
     damageUpgradeDisplay.text = str(round(damageUpgrade,1)) + "x"
