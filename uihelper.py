@@ -289,7 +289,7 @@ class projectileElement:
             tower.kill(self)
 
 class mageTowerElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=6, speed=90, radius=100, price=200, attackradius=50):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=5, speed=90, radius=100, price=200, attackradius=50):
         self.image = image
         self.width = image.width
         self.height = image.height
