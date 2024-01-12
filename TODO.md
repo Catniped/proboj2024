@@ -1,5 +1,8 @@
 # TODO
-- [ ] enemies
-- [ ] towerky
+- [x] enemies
+- [x] towerky
 - [x] projectile physics
-- [ ] uis
+- [x] uis
+- [ ] hudba
+- [ ] bomba
+- [ ] prehra
