@@ -7,11 +7,10 @@ Na spustenie je potrebné mať nainštalované tieto veci:
 - pip
 
 # Inštalácia
-1. Naklonuj si repozitár
+1. Naklonuj si repozitár alebo si stiahni [ZIP súbor](https://github.com/Catniped/proboj2024/zipball/main)
 ```
 git clone https://github.com/Catniped/proboj2024.git
 ```
-  alebo si stiahni [ZIP súbor](https://github.com/Catniped/proboj2024/zipball/main)
 2. Nainštaluj si potrebné knižnice cez pip.
 ```
 pip install -r requirements.txt
