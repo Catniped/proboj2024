@@ -122,7 +122,7 @@ damageUpgradeDisplay = uihelper.textElement(str(damageUpgrade) + "x","Poppins",3
 speedUpgradePriceDisplay = uihelper.textElement(str(speedUpgradePrice),"Poppins",30,((905*x_scale,window.height-290)),ui=True,group=shopui)
 speedUpgradeDisplay = uihelper.textElement(str(speedUpgrade) + "x","Poppins",30,((920,window.height-125)),ui=True,group=shopui)
 
-easygame.play_audio(easygame.load_audio("Assets/Audio/background_music.wav"), 0, True)
+easygame.play_audio(easygame.load_audio("Assets/Audio/background_music.mp3"), 0, True)
 
 while not should_quit:
     camera=easygame.get_camera()
