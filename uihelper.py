@@ -169,10 +169,11 @@ class archerTowerElement:
         self.price = price
         self.cooldown = 0
         self.target = None
+        self.FPS = 60
 
         group.elements.append(self)
     
-    def cooldownCheck(self, enemygroup, balance):
+    def cooldownCheck(self, enemygroup, projectilegroup):
         if self.cooldown > 0:
             self.cooldown-=1
         else:
@@ -196,15 +197,40 @@ class archerTowerElement:
                             break
 
 
-    """def target(self,enemyxy,enemyspeed,enemyvector):
-        terminalpos = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
+    def target(self,enemyxy,enemyspeed):
+        terminalpos = (enemyxy[0] + enemyspeed[0] * self.FPS , enemyxy[1] + enemyspeed[1] * self.FPS)
         return terminalpos
     
+
+
+class projectileElement:
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, velocity = (0,0)):
+        self.image = image
+        self.width = image.width
+        self.height = image.height
+        self.center = image.center
+        self.position = position
+        self.anchor = anchor
+        self.rotation = rotation
+        self.scale = scale
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+        self.opacity = opacity
+        self.pixelated = pixelated
+        self.enabled = False
+        self.visible = True
+        self.callback = callback
+        self.ui = ui
+
+        self.velocity = velocity
+
+        group.elements.append(self)
+
     def move_arrow(self,pos,target):
-        pos[0] += target[0]/30
-        pos[1] += target[1]/30
-        return pos"""
-    
+        pos[0] += target[0]/self.FPS
+        pos[1] += target[1]/self.FPS
+        return pos
+
 class mageTowerElement:
     def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
         self.image = image
