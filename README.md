@@ -15,10 +15,6 @@ git clone https://github.com/Catniped/proboj2024.git
 ```
 pip install -r requirements.txt
 ```
-  alebo
-```
-python -m pip install -r requirements.txt
-```
 
 # Spustenie
 Spustíš to spustením súboru `game.py`.

@@ -4,5 +4,6 @@
 - [x] projectile physics
 - [x] uis
 - [x] hudba
-- [ ] bomba
-- [ ] prehra
+- [x] bomba
+- [x] prehra
+- [ ] playtest
