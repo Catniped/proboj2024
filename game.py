@@ -13,6 +13,7 @@ should_quit = False
 tower = None
 placetower = False
 killcounter = 0
+difficultyModifier = 1
 
 window = easygame.open_window('window', 1600, 900, False, resizable=False)
 
@@ -29,14 +30,17 @@ def toggleShop(buttons):
         shopui.visible = False
         shopui.enabled = False
 
-def buyTower(buttons):
+def buyArcherTower(buttons):
     global tower
     global placetower
-    global downl
-    global balance
-    if balance-100 >= 0:
-        tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3)
-        placetower = True
+    tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3,price=100*difficultyModifier)
+    placetower = True
+
+def buyMageTower(buttons):
+    global tower
+    global placetower
+    tower = uihelper.mageTowerElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3,price=100*difficultyModifier)
+    placetower = True
     
 mapi = easygame.load_image("Assets/Tileset/map.png")
 offset = -(mapi.width*0.2 - window.width*2)
@@ -56,8 +60,10 @@ uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blu
 balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(1469,804),ui=True,group=ui1)
 
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,595),group=shopui,scale=1,enabled=False,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,660),group=shopui,scale=1.1,enabled=True,callback=buyTower,ui=True)
-uihelper.textElement("100","Poppins",30,((315,610)),ui=True,group=shopui)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,660),group=shopui,scale=1.1,enabled=True,callback=buyArcherTower,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(475,660),group=shopui,scale=1.1,enabled=True,callback=buyMageTower,ui=True)
+uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((315,610)),ui=True,group=shopui)
+uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((515,610)),ui=True,group=shopui)
 
 
 while not should_quit:
@@ -111,7 +117,7 @@ while not should_quit:
             towers.kill(tower)
             placetower = False
             tower = None
-        elif uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downrm):
+        elif uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downrm,balance):
             balance-=tower.price
             placetower = False
             tower = None
