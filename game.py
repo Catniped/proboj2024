@@ -8,7 +8,7 @@ mousey = (0,0)
 cancel = False
 downrm = False
 downl = False
-fullscreen = True
+fullscreen = False
 should_quit = False
 tower = None
 placetower = False
@@ -54,16 +54,16 @@ projectiles = uihelper.uiGroup()
 cartIconIdle = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Idle.png")
 cartIconActive = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Click.png")
 
-cartIcon = uihelper.uiElement(cartIconIdle,(50,795),group=ui1,scale=1,callback=toggleShop,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(1450,795),group=ui1,scale=1,enabled=False,ui=True)
+
+cartIcon = uihelper.uiElement(cartIconIdle,(50,window.height-105),group=ui1,scale=1,callback=toggleShop,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(window.width-150,window.height-105),group=ui1,scale=1,enabled=False,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)
-balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(1469,804),ui=True,group=ui1)
+balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
 
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,595),group=shopui,scale=1,enabled=False,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,660),group=shopui,scale=1.1,enabled=True,callback=buyArcherTower,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(475,660),group=shopui,scale=1.1,enabled=True,callback=buyMageTower,ui=True)
 uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((315,610)),ui=True,group=shopui)
-uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((515,610)),ui=True,group=shopui)
 
 
 while not should_quit:
@@ -85,10 +85,10 @@ while not should_quit:
             else:
                 downl = False
         elif evtype is easygame.MouseMoveEvent:
-            mousex = event.x
-            mousey = event.y
+            mousex = event.x-camera.position[0]
+            mousey = event.y-camera.position[1]
             if downrm:
-                easygame.move_camera((-event.dx,-event.dy))
+                easygame.move_camera((-event.dx/camera.zoom,-event.dy/camera.zoom))
         elif evtype is easygame.KeyDownEvent:
             if event.key == "F11":
                 fullscreen = not fullscreen
