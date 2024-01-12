@@ -5,4 +5,4 @@
 - [x] uis
 - [x] hudba
 - [x] bomba
-- [ ] prehra
+- [x] prehra
