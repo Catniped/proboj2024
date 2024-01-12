@@ -199,16 +199,16 @@ class archerTowerElement:
 
         group.elements.append(self)
     
-    def cooldownCheck(self, enemygroup, projectilegroup):
+    def cooldownCheck(self, enemygroup, projectilegroup, dmgMultiplier, speedMultiplier):
         for arrow in self.arrows:
             arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),(1,1)))
-            return arrow.tick(self.target, enemygroup, projectilegroup, self)
+            return arrow.tick(self.target, enemygroup, projectilegroup, self, dmgMultiplier)
         if self.cooldown > 0:
             self.cooldown-=1
         else:
             if self.enabled:
                 if self.target:
-                    self.cooldown = self.speed
+                    self.cooldown = self.speed*speedMultiplier
                     self.arrows.append(projectileElement(self.arrowcache,(self.position[0],self.position[1]),group=projectilegroup,damage=self.damage)) 
                 else:
                     for enemy in enemygroup.elements:
@@ -266,12 +266,12 @@ class projectileElement:
     def rotate_arrow(self,velocity):
         self.rotation = atan(velocity[1]/velocity[0])
 
-    def tick(self, enemy, enemygroup, projectilegroup, tower):
+    def tick(self, enemy, enemygroup, projectilegroup, tower, dmgMultiplier):
         if self.lifetime < self.maxlifetime:
             self.lifetime+=1
         else:
             if enemy:
-                enemy.health-=self.damage
+                enemy.health-=self.damage*dmgMultiplier
                 if enemy.health <= 0:
                     i = enemy
                     r = i.reward
@@ -281,7 +281,7 @@ class projectileElement:
             tower.kill(self)
 
 class mageTowerElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=3, speed=60, radius=100, price=100, attackradius=50):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=2, speed=60, radius=100, price=200, attackradius=50):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -311,7 +311,7 @@ class mageTowerElement:
 
         group.elements.append(self)
     
-    def cooldownCheck(self, enemygroup, projectilesgroup):
+    def cooldownCheck(self, enemygroup, projectilesgroup, dmgMultiplier, speedMultiplier):
         if self.cooldown > 0:
             self.cooldown-=1
         else:
@@ -326,11 +326,11 @@ class mageTowerElement:
                     circleElement((px,py),self.attackradius,(0.188, 0.066, 0.245, 0.6),group=projectilesgroup,lifetime=30)
                     resettarget = False
                     kc = 0
-                    self.cooldown = self.speed
+                    self.cooldown = self.speed*speedMultiplier
                     for enemy in enemygroup.elements:
                         ex,ey = enemy.position
                         if (ex - px)**2 + (ey - py)**2 < self.attackradius**2:
-                            enemy.health-=self.damage
+                            enemy.health-=self.damage*dmgMultiplier
                         if enemy.health <= 0:
                             i = enemy
                             r = i.reward
