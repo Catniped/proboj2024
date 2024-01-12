@@ -265,7 +265,7 @@ class projectileElement:
         return pos
     
     def rotate_arrow(self,velocity):
-        self.rotation = atan2(velocity[0],velocity[1]) #- pi/2
+        self.rotation = atan2(velocity[0],velocity[1]) - pi/2
 
     def tick(self, enemy, enemygroup, projectilegroup, tower, dmgMultiplier):
         if self.lifetime < self.maxlifetime:
