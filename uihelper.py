@@ -195,14 +195,13 @@ class archerTowerElement:
         self.cooldown = 0
         self.target = None
         self.arrows = []
-        self.FPS = 60
-
         self.arrowcache = easygame.load_image("Assets/Sprites/Towers/Archer/arrow.png")
 
         group.elements.append(self)
     
     def cooldownCheck(self, enemygroup, projectilegroup):
         for arrow in self.arrows:
+            arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),(1,1)))
             return arrow.tick(self.target, enemygroup, projectilegroup, self)
         if self.cooldown > 0:
             self.cooldown-=1
@@ -213,17 +212,18 @@ class archerTowerElement:
                     self.arrows.append(projectileElement(self.arrowcache,(self.position[0],self.position[1]),group=projectilegroup,damage=self.damage)) 
                 else:
                     for enemy in enemygroup.elements:
-                        ex,ey = enemy.position
+                        self.ex,self.ey = enemy.position
                         px,py = self.position
 
-                        if (ex - px)**2 + (ey - py)**2 < self.radius**2:
+                        if (self.ex - px)**2 + (self.ey - py)**2 < self.radius**2:
                             self.target = enemy
                             break
 
 
-    def target(self,enemyxy,enemyspeed):
-        velocity = ((enemyxy[0] + enemyspeed[0] * self.speed, enemyxy[1] + enemyspeed[1] * self.speed) - self.position)/self.speed
-        return velocity
+    def get_velocity(self,enemyxy,enemyspeed):
+        velocity1 = (enemyxy[0] + enemyspeed[0] * self.speed - self.position[0])/self.speed
+        velocity2 = (enemyxy[1] + enemyspeed[1] * self.speed - self.position[1])/self.speed
+        return (velocity1, velocity2)
     
     def kill(self, obj):
         try:
@@ -258,9 +258,9 @@ class projectileElement:
 
         group.elements.append(self)
 
-    def move_arrow(self,pos,target):
-        pos[0] += target[0]/self.FPS
-        pos[1] += target[1]/self.FPS
+    def move_arrow(self,pos):
+        pos[0] += self.velocity
+        pos[1] += self.velocity
         return pos
     
     def rotate_arrow(self,velocity):
