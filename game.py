@@ -46,6 +46,10 @@ def buyMageTower(buttons):
 mapi = easygame.load_image("Assets/Tileset/map.png")
 offset = -(mapi.width*0.2 - window.width*2)
 # print(offset)
+
+x_scale=window.width/1600
+y_scale=window.height/900
+
 xs=x_scale
 if x_scale==1:
     xs=0
