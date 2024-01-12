@@ -169,7 +169,6 @@ class archerTowerElement:
         self.price = price
         self.cooldown = 0
         self.target = None
-        self.FPS = 60
 
         group.elements.append(self)
     
@@ -198,8 +197,8 @@ class archerTowerElement:
 
 
     def target(self,enemyxy,enemyspeed):
-        terminalpos = (enemyxy[0] + enemyspeed[0] * self.FPS , enemyxy[1] + enemyspeed[1] * self.FPS)
-        return terminalpos
+        velocity = ((enemyxy[0] + enemyspeed[0] * self.speed, enemyxy[1] + enemyspeed[1] * self.speed) - self.position)/self.speed
+        return velocity
     
 
 
@@ -226,10 +225,10 @@ class projectileElement:
 
         group.elements.append(self)
 
-    def move_arrow(self,pos,target):
-        pos[0] += target[0]/self.FPS
-        pos[1] += target[1]/self.FPS
-        return pos
+    def move_arrow(self):
+        self.position[0] += self.velocity[0]
+        self.position[1] += self.velocity[1]
+        return self.position
 
 class mageTowerElement:
     def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
