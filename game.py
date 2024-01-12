@@ -88,6 +88,9 @@ while not should_quit:
         r=tower.cooldownCheck(enemies, balance)
         if r:
             balance+=r
+
+    for arrow in projectiles:
+        arrow.move_arrow()
             
     if balanceprev != balance:
         print(f"Balance changed: {balance}, +{balance-balanceprev}")
