@@ -56,10 +56,6 @@ if y_scale==1:
 
 offset=-76.8*x_scale+100*xs
 offsetY=((116)*(y_scale))
-print(y_scale)
-print(offsetY)
-print(116*(y_scale-1))
-# offsetY=0
 
 ui1 = uihelper.uiGroup()
 shopui = uihelper.uiGroup(visible=False,enabled=False)
@@ -137,7 +133,7 @@ while not should_quit:
             towers.kill(tower)
             placetower = False
             tower = None
-        elif uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downrm):
+        elif uihelper.placeTower(tower,mousex+camera.position[0]*2,mousey+camera.position[1]*2,downrm):
             balance-=tower.price
             placetower = False
             tower = None
