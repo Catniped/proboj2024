@@ -1,4 +1,4 @@
-# Rieka
+# Hra Rieka
 Je to hra na proboj, ktorý sa konal 12.1.2024 vo Floriho chate pri Bardejove.
 
 # Pred inštaláciou
