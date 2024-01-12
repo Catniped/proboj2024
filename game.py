@@ -115,8 +115,6 @@ speedUpgradeDisplay = uihelper.textElement(str(speedUpgrade) + "x","Poppins",30,
 
 while not should_quit:
     camera=easygame.get_camera()
-    if playButton.image is playIconClick:
-        playButton.image=playIconIdle
     for event in easygame.poll_events():
         evtype = type(event)
         if evtype is easygame.CloseEvent:
