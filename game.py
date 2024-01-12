@@ -163,6 +163,9 @@ while not should_quit:
     for enemy in enemies.elements:
         enemy.move()
 
+    for arrow in projectiles.elements:
+        arrow.move_arrow()
+
     if placetower:
         if cancel:
             towers.kill(tower)
