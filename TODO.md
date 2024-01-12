@@ -1,5 +1,5 @@
 # TODO
-- enemies
-- towerky
-[x] projectile physics
-- uis
+- [ ] enemies
+- [ ] towerky
+- [x] projectile physics
+- [ ] uis
