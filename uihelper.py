@@ -1,6 +1,6 @@
 from easygame import draw_image, draw_text
 import easygame, numpy
-from math import isclose
+from math import isclose, atan
 
 class uiGroup:
     """Object which groups together multiple UI Elements (images) and manages their rendering and callbacks"""
@@ -236,6 +236,9 @@ class projectileElement:
         pos[0] += target[0]/self.FPS
         pos[1] += target[1]/self.FPS
         return pos
+    
+    def rotate_arrow(self,velocity):
+        self.rotation = atan(velocity[1]/velocity[0])
 
     def tick(self, enemy, enemygroup, projectilegroup, tower):
         if self.lifetime < self.maxlifetime:
