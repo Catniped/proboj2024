@@ -1,32 +1,61 @@
-import easygame, uihelper, pyglet
-
-window = easygame.open_window('window', 1600, 900, False, resizable=False)
-
-def testCallback(button):
-    uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3,health=100)
-
-mapi = easygame.load_image("Assets/Tileset/map.png")
-offset = -(mapi.width*0.2 - window.width*2)
-
-ui1 = uihelper.uiGroup()
-enemies = uihelper.uiGroup()
-towers = uihelper.uiGroup()
-projectiles = uihelper.uiGroup()
-
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=testCallback,ui=True)
+import easygame, uihelper, pyglet, time
 
 balance = 1000
-balanceprev = 0
 cooldown = 0
 arrows = []
 mousex = (0,0)
 mousey = (0,0)
-placetower = False
 cancel = False
 downrm = False
 downl = False
 fullscreen = True
 should_quit = False
+tower = None
+placetower = False
+killcounter = 0
+
+window = easygame.open_window('window', 1600, 900, False, resizable=False)
+
+def toggleShop(buttons):
+    if not shopui.enabled:
+        cartIcon.image = cartIconActive
+        shopui.visible = True
+        shopui.enabled = True
+    else:
+        cartIcon.image = cartIconIdle
+        shopui.visible = False
+        shopui.enabled = False
+
+def buyTower(buttons):
+    global tower
+    global placetower
+    global downl
+    global balance
+    if balance-100 >= 0:
+        tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3)
+        placetower = True
+    
+mapi = easygame.load_image("Assets/Tileset/map.png")
+offset = -(mapi.width*0.2 - window.width*2)
+
+ui1 = uihelper.uiGroup()
+shopui = uihelper.uiGroup(visible=False,enabled=False)
+enemies = uihelper.uiGroup()
+towers = uihelper.uiGroup()
+projectiles = uihelper.uiGroup()
+
+cartIconIdle = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Idle.png")
+cartIconActive = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Click.png")
+
+cartIcon = uihelper.uiElement(cartIconIdle,(50,795),group=ui1,scale=1,callback=toggleShop,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(1450,795),group=ui1,scale=1,enabled=False,ui=True)
+balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(1469,804),ui=True,group=ui1)
+
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,595),group=shopui,scale=1,enabled=False,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,660),group=shopui,scale=1.1,enabled=True,callback=buyTower,ui=True)
+uihelper.textElement("100","Poppins",30,((315,610)),ui=True,group=shopui)
+
+
 while not should_quit:
     camera=easygame.get_camera()
     for event in easygame.poll_events():
@@ -35,6 +64,7 @@ while not should_quit:
             should_quit = True
         elif evtype is easygame.MouseDownEvent:
             ui1.checkGroup(event)
+            shopui.checkGroup(event)
             if event.button != "LEFT":
                 downrm = True
             else:
@@ -53,9 +83,6 @@ while not should_quit:
             if event.key == "F11":
                 fullscreen = not fullscreen
                 window.set_fullscreen(fullscreen)
-            elif event.key == "E":
-                tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3)
-                placetower = True
             elif event.key == "ESC":
                 cancel = True
         elif evtype is easygame.KeyUpEvent:
@@ -80,25 +107,24 @@ while not should_quit:
             towers.kill(tower)
             placetower = False
             tower = None
-        elif uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downl):
+        elif uihelper.placeTower(tower,mousex+camera.position[0],mousey+camera.position[1],downrm):
+            balance-=tower.price
             placetower = False
             tower = None
 
     for tower in towers.elements:
         r=tower.cooldownCheck(enemies, balance)
         if r:
+            killcounter+=1
             balance+=r
-            
-    if balanceprev != balance:
-        print(f"Balance changed: {balance}, +{balance-balanceprev}")
-        balanceprev = balance
 
+    balanceDisplay.text = str(balance)
 
     """rendering"""
-    ui1.renderGroup(window)
     towers.renderGroup(window)
     enemies.renderGroup(window)
-    easygame.draw_text(str(balance),"Poppins",50,(100,200),ui=True)
+    ui1.renderGroup(window)
+    shopui.renderGroup(window)
     easygame.next_frame()
  
 easygame.close_window()

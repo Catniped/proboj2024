@@ -1,13 +1,13 @@
-from easygame import draw_image
+from easygame import draw_image, draw_text
 import easygame, numpy
 from math import isclose
 
 class uiGroup:
     """Object which groups together multiple UI Elements (images) and manages their rendering and callbacks"""
-    def __init__(self):
+    def __init__(self, visible=True, enabled=True):
         self.elements = []
-        self.visible = True
-        self.enabled = True
+        self.visible = visible
+        self.enabled = enabled
 
     def changeElementVisibility(self, visible):
         """Changes visibility property of the group and all elements"""
@@ -31,14 +31,19 @@ class uiGroup:
         """Renders all elements in UI Group, only considers parent group visibility"""
         if self.visible:
             for element in self.elements:
-                draw_image(element.image, element.position, element.anchor, element.rotation, element.scale, element.scale_x, element.scale_y, element.opacity, element.pixelated, element.ui)
+                if type(element) != textElement:
+                    draw_image(element.image, element.position, element.anchor, element.rotation, element.scale, element.scale_x, element.scale_y, element.opacity, element.pixelated, element.ui)
+                elif type(element) == textElement:
+                    draw_text(element.text, element.font, element.size, element.position, element.anchor, element.color, element.bold, element.italic, element.ui)
 
     def checkGroup(self, event):
         """Checks whether an element in the group was clicked by the event passed, if true activates callback of the element"""
         if self.enabled:
             for element in self.elements:
-                if checkIntersection(element.position, element.width*2, element.height*2, (event.x, event.y)):
-                    element.clicked(event.button)
+                if type(element) == uiElement:
+                    if element.enabled:
+                        if checkIntersection(element.position, element.width*element.scale, element.height*element.scale, (event.x, event.y)):
+                            element.clicked(event.button)
     
     def kill(self, obj):
         try:
@@ -50,7 +55,7 @@ class uiGroup:
 
 class uiElement:
     """Image used in the UI"""
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, enabled=True, visible=True):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -63,10 +68,29 @@ class uiElement:
         self.scale_y = scale_y
         self.opacity = opacity
         self.pixelated = pixelated
-        self.enabled = True
-        self.visible = True
+        self.enabled = enabled
+        self.visible = visible
         self.callback = callback
         self.ui = ui
+
+        group.elements.append(self)
+    
+    def clicked(self, button):
+        self.callback(button)
+
+class textElement:
+    """Image used in the UI"""
+    def __init__(self, text, font, size, position=(0, 0), anchor=("left", "bottom"), color=(1, 1, 1, 1), bold=False, italic=False, ui=False, group=uiGroup, visible=True):
+        self.text = text
+        self.font = font
+        self.size = size
+        self.position = position
+        self.anchor = anchor
+        self.color = color
+        self.bold = bold
+        self.italic = italic
+        self.ui = ui
+        self.visible = visible
 
         group.elements.append(self)
     
@@ -121,7 +145,7 @@ class enemyElement:
             self.velocity = (self.speed if rx < x else -self.speed, ys if ry < y else ys)
 
 class archerTowerElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=30, radius=100):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=30, radius=100, price=100):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -134,7 +158,7 @@ class archerTowerElement:
         self.scale_y = scale_y
         self.opacity = opacity
         self.pixelated = pixelated
-        self.enabled = False
+        self.enabled = True
         self.visible = True
         self.callback = callback
         self.ui = ui
@@ -142,12 +166,13 @@ class archerTowerElement:
         self.damage = damage
         self.speed = speed
         self.radius = radius
+        self.price = price
         self.cooldown = 0
         self.target = None
 
         group.elements.append(self)
     
-    def cooldownCheck(self, enemygroup, balance):
+    def cooldownCheck(self, enemygroup, projectilegroup):
         if self.cooldown > 0:
             self.cooldown-=1
         else:
@@ -171,15 +196,40 @@ class archerTowerElement:
                             break
 
 
-    """def target(self,enemyxy,enemyspeed,enemyvector):
-        terminalpos = (enemyxy[0] + enemyspeed * self.speed * enemyvector[0], enemyxy[1] + enemyspeed * self.speed * enemyvector[1])
-        return terminalpos
+    def target(self,enemyxy,enemyspeed):
+        velocity = ((enemyxy[0] + enemyspeed[0] * self.speed, enemyxy[1] + enemyspeed[1] * self.speed) - self.position)/self.speed
+        return velocity
     
-    def move_arrow(self,pos,target):
-        pos[0] += target[0]/30
-        pos[1] += target[1]/30
-        return pos"""
-    
+
+
+class projectileElement:
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, velocity = (0,0)):
+        self.image = image
+        self.width = image.width
+        self.height = image.height
+        self.center = image.center
+        self.position = position
+        self.anchor = anchor
+        self.rotation = rotation
+        self.scale = scale
+        self.scale_x = scale_x
+        self.scale_y = scale_y
+        self.opacity = opacity
+        self.pixelated = pixelated
+        self.enabled = False
+        self.visible = True
+        self.callback = callback
+        self.ui = ui
+
+        self.velocity = velocity
+
+        group.elements.append(self)
+
+    def move_arrow(self):
+        self.position[0] += self.velocity[0]
+        self.position[1] += self.velocity[1]
+        return self.position
+
 class mageTowerElement:
     def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=10, speed=1, radius=10):
         self.image = image
