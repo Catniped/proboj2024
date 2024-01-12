@@ -209,7 +209,7 @@ class archerTowerElement:
     def cooldownCheck(self, enemygroup, projectilegroup, dmgMultiplier, speedMultiplier):
         for arrow in self.arrows:
             if self.target:
-                arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),self.target.velocity))
+                arrow.rotate_arrow(self.get_velocity(self.target.position,self.target.velocity))
             return arrow.tick(self.target, enemygroup, projectilegroup, self, dmgMultiplier)
         if self.cooldown > 0:
             self.cooldown-=1
@@ -220,10 +220,10 @@ class archerTowerElement:
                     self.arrows.append(projectileElement(self.arrowcache,(self.position[0],self.position[1]),group=projectilegroup,damage=self.damage)) 
                 else:
                     for enemy in enemygroup.elements:
-                        self.ex,self.ey = enemy.position
+                        ex,ey = enemy.position
                         px,py = self.position
 
-                        if (self.ex - px)**2 + (self.ey - py)**2 < self.radius**2:
+                        if (ex - px)**2 + (ey - py)**2 < self.radius**2:
                             self.target = enemy
                             break
 
@@ -266,13 +266,13 @@ class projectileElement:
 
         group.elements.append(self)
 
-    def move_arrow(self,pos):
-        pos[0] += self.velocity
-        pos[1] += self.velocity
-        return pos
+    def move_arrow(self):
+        x = self.position[0]
+        y = self.position[1]
+        self.position =  (x + self.velocity[0], y + self.velocity[1])
     
     def rotate_arrow(self,velocity):
-        self.rotation = atan2(velocity[0],velocity[1]) #- pi/2
+        self.rotation = atan2(velocity[0],velocity[1])
 
     def tick(self, enemy, enemygroup, projectilegroup, tower, dmgMultiplier):
         if self.lifetime < self.maxlifetime:

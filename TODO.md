@@ -3,6 +3,6 @@
 - [x] towerky
 - [x] projectile physics
 - [x] uis
-- [ ] hudba
+- [x] hudba
 - [ ] bomba
 - [ ] prehra
