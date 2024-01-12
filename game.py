@@ -104,7 +104,7 @@ cartIconActive = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blu
 
 cartIcon = uihelper.uiElement(cartIconIdle,(50,window.height-105),group=ui1,scale=1,callback=toggleShop,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(window.width-150,window.height-105),group=ui1,scale=1,enabled=False,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(50,50),group=ui1,scale=1,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(50,50),group=ui1,scale=1,ui=True,enabled=False)
 BALANCEDisplay = uihelper.textElement(str(BALANCE),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
 CASTLEHEALTHDisplay = uihelper.textElement(str(CASTLEHEALTH),"Poppins",30,(80,57),ui=True,group=ui1)
 
