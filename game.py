@@ -8,13 +8,17 @@ mousey = (0,0)
 cancel = False
 downrm = False
 downl = False
-fullscreen = True
+fullscreen = False
 should_quit = False
 tower = None
 placetower = False
 killcounter = 0
 
-window = easygame.open_window('window', 1600, 900, False, resizable=False)
+window = easygame.open_window('window', 1600, 900, fullscreen=fullscreen, resizable=False)
+
+
+x_scale=window.width/1600
+y_scale=window.height/900
 
 def spawnTestEnemy(buttons):
     uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3)
@@ -35,6 +39,7 @@ def buyTower(buttons):
     global downl
     global balance
     if balance-100 >= 0:
+        toggleShop(None)
         tower = uihelper.archerTowerElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3)
         placetower = True
     
@@ -50,14 +55,16 @@ projectiles = uihelper.uiGroup()
 cartIconIdle = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Idle.png")
 cartIconActive = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Click.png")
 
-cartIcon = uihelper.uiElement(cartIconIdle,(50,795),group=ui1,scale=1,callback=toggleShop,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(1450,795),group=ui1,scale=1,enabled=False,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)
-balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(1469,804),ui=True,group=ui1)
 
-uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,595),group=shopui,scale=1,enabled=False,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,660),group=shopui,scale=1.1,enabled=True,callback=buyTower,ui=True)
-uihelper.textElement("100","Poppins",30,((315,610)),ui=True,group=shopui)
+cartIcon = uihelper.uiElement(cartIconIdle,(50,window.height-105),group=ui1,scale=1,callback=toggleShop,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(window.width-150,window.height-105),group=ui1,scale=1,enabled=False,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)
+balanceDisplay = uihelper.textElement(str(balance),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
+
+
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225*x_scale,window.height-305),group=shopui,scale=1*x_scale,enabled=False,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyTower,ui=True)
+uihelper.textElement("100","Poppins",30,((315,window.height-290)),ui=True,group=shopui)
 
 
 while not should_quit:
@@ -79,10 +86,10 @@ while not should_quit:
             else:
                 downl = False
         elif evtype is easygame.MouseMoveEvent:
-            mousex = event.x
-            mousey = event.y
+            mousex = event.x-camera.position[0]
+            mousey = event.y-camera.position[1]
             if downrm:
-                easygame.move_camera((-event.dx,-event.dy))
+                easygame.move_camera((-event.dx/camera.zoom,-event.dy/camera.zoom))
         elif evtype is easygame.KeyDownEvent:
             if event.key == "F11":
                 fullscreen = not fullscreen
