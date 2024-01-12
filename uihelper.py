@@ -201,7 +201,7 @@ class archerTowerElement:
     
     def cooldownCheck(self, enemygroup, projectilegroup, dmgMultiplier, speedMultiplier):
         for arrow in self.arrows:
-            arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),"""INSERT ENEMY VELOCITY""")).
+            arrow.rotate_arrow(self.get_velocity((self.ex,self.ey),"""INSERT ENEMY VELOCITY"""))
             return arrow.tick(self.target, enemygroup, projectilegroup, self, dmgMultiplier)
         if self.cooldown > 0:
             self.cooldown-=1
