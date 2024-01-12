@@ -143,7 +143,8 @@ class enemyElement:
         self.speed = speed
         self.routeto = None
         self.velocity = (0,0)
-        self.waypoints = [(1020, 300),(594,540),(731,615),(595,693)]
+        self.waypoints = [(1020, 315),(600,545),(740,625),(595,693)]
+        self.group = group
 
         group.elements.append(self)
     
@@ -157,8 +158,10 @@ class enemyElement:
             if not isclose(x, rx, abs_tol=2) and not isclose(y, ry, abs_tol=2):
                 xv, yv = self.velocity
                 self.position = (x-xv,y-yv)
+                return False
             else:
                 self.routeto = None
+                return False
         elif self.waypoints:
             rx, ry = self.waypoints.pop(0)
             # self.routeto = self.waypoints.pop(0)
@@ -168,6 +171,10 @@ class enemyElement:
             self.routeto=(rx, ry)
             ys = ((ry - y)/-abs(rx - x))*self.speed
             self.velocity = (self.speed if rx < x else -self.speed, ys if ry < y else ys)
+            return False
+        else:
+            self.group.kill(obj=self)
+            return True
 
 class archerTowerElement:
     def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=8, speed=30, radius=100, price=100):
@@ -195,7 +202,7 @@ class archerTowerElement:
         self.cooldown = 0
         self.target = None
         self.arrows = []
-        self.arrowcache = easygame.load_image("Assets/Sprites/Towers/Archer/arrow.png")
+        self.arrowcache = easygame.load_image("Assets/Sprites/Towers/Archer/bow_animation(3).png")
 
         group.elements.append(self)
     
@@ -282,7 +289,7 @@ class projectileElement:
             tower.kill(self)
 
 class mageTowerElement:
-    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=2, speed=60, radius=100, price=200, attackradius=50):
+    def __init__(self, image=None, position=(0, 0), anchor=None, rotation=0, scale=1, scale_x=1, scale_y=1, opacity=1, pixelated=False, group=uiGroup, callback=None, ui=False, damage=6, speed=90, radius=100, price=200, attackradius=50):
         self.image = image
         self.width = image.width
         self.height = image.height
@@ -332,6 +339,7 @@ class mageTowerElement:
                         ex,ey = enemy.position
                         if (ex - px)**2 + (ey - py)**2 < self.attackradius**2:
                             enemy.health-=self.damage*dmgMultiplier
+                            enemy.speed*=0.9
                         if enemy.health <= 0:
                             i = enemy
                             r = i.reward
@@ -372,6 +380,19 @@ def placeTower(tower, umousex, umousey, down, BALANCE):
     if down and BALANCE >= tower.price:
         tower.opacity = 1
         tower.enabled = True
+        return True
+    return False
+
+def placeBomb(enemies, umousex, umousey, down, BALANCE, modifier):
+    scale = easygame.get_camera().zoom
+    mousex = umousex/scale
+    mousey = umousey/scale
+    easygame.draw_circle((mousex,mousey),100,color=(0.200, 0.066, 0.245, 0.2))
+    if down and BALANCE >= 1000*modifier:
+        for enemy in enemies.elements:
+            ex,ey = enemy.position
+            if (ex - mousex)**2 + (ey - mousey)**2 < 100**2:
+                enemy.group.kill(enemy)
         return True
     return False
 

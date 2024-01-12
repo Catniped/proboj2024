@@ -799,7 +799,6 @@ def play_audio(audio, channel=0, loop=False, volume=1, speed=1):
         #player.loop = True
         player.queue(audio._snd)
         player.queue(audio._snd)
-        print('WAT')
     else:
         player.queue(audio._snd)
     player.volume = volume

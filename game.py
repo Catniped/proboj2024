@@ -1,7 +1,8 @@
-import easygame, uihelper, pyglet, random
+import easygame, uihelper, pyglet, random, sys
 
-DIFFICULTY = 25
+SPAWNRATE = int(sys.argv[1]) if len(sys.argv) >= 2 else 25
 BALANCE = 1000
+CASTLEHEALTH = 100
 cooldown = 0
 arrows = []
 mousex = (0,0)
@@ -13,6 +14,7 @@ fullscreen = False
 should_quit = False
 tower = None
 placetower = False
+placebomb = False
 killcounter = 0
 difficultyModifier = 1
 damageUpgrade = 1
@@ -20,12 +22,16 @@ damageUpgradePrice = 1000
 speedUpgrade = 1
 speedUpgradePrice = 1000
 
-window = easygame.open_window('window', 1600, 900, False, resizable=True)
+window = easygame.open_window('window', 1600, 900, False, resizable=False)
+
+palace = easygame.load_image("Assets/Sprites/chineees_castle.png")
+
+palace = easygame.load_image("Assets/Sprites/chineees_castle.png")
 
 def spawnEnemies():
-    chanceModifier = round(DIFFICULTY/difficultyModifier*2,0)
+    chanceModifier = round(SPAWNRATE/difficultyModifier*2,0)
     if not random.randint(0,chanceModifier):
-        uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3,reward=5*difficultyModifier*1.5,health=5*difficultyModifier*3)
+        uihelper.enemyElement(easygame.load_image("Assets/Sprites/UFO/UFO(3).png"),(1362,495),group=enemies,scale=0.3,reward=5*difficultyModifier*1.5,health=10*difficultyModifier*3, speed=1*difficultyModifier)
 
 def toggleShop(buttons):
     if not shopui.enabled:
@@ -46,7 +52,7 @@ def buyArcherTower(buttons):
 def buyMageTower(buttons):
     global tower
     global placetower
-    tower = uihelper.mageTowerElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3,price=200*difficultyModifier)
+    tower = uihelper.mageTowerElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_3.png"),(mousex+camera.position[0], mousey+camera.position[1]),group=towers,scale=0.3,price=200*difficultyModifier)
     placetower = True
 
 def buyDamageUpgrade(buttons):
@@ -66,10 +72,13 @@ def buySpeedUpgrade(buttons):
         BALANCE-=speedUpgradePrice
         speedUpgradePrice*=2
         speedUpgrade*=0.9
+
+def buyBomb(buttons):
+    global placebomb
+    placebomb = True
     
 mapi = easygame.load_image("Assets/Tileset/map.png")
 offset = -(mapi.width*0.2 - window.width*2)
-# print(offset)
 
 x_scale=window.width/1600
 y_scale=window.height/900
@@ -93,21 +102,21 @@ projectiles = uihelper.uiGroup()
 cartIconIdle = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Idle.png")
 cartIconActive = easygame.load_image("Assets/Buttons/png/Buttons/Square-Icon-Blue/Cart-Click.png")
 
-playIconIdle = easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png")
-playIconClick = easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Click.png")
-
 cartIcon = uihelper.uiElement(cartIconIdle,(50,window.height-105),group=ui1,scale=1,callback=toggleShop,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(window.width-150,window.height-105),group=ui1,scale=1,enabled=False,ui=True)
-"""uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Buttons/Rect-Icon-Blue/Play-Idle.png"),(100,100),group=ui1,scale=1,callback=spawnTestEnemy,ui=True)"""
-BALANCEDisplay = uihelper.textElement(str(BALANCE),"Poppins",30,(window.width-140,window.height-96),ui=True,group=ui1)
+uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle.png"),(50,50),group=ui1,scale=1,ui=True)
+BALANCEDisplay = uihelper.textElement(str(BALANCE),"Poppins",30,(window.width-135,window.height-96),ui=True,group=ui1)
+CASTLEHEALTHDisplay = uihelper.textElement(str(CASTLEHEALTH),"Poppins",30,(80,57),ui=True,group=ui1)
 
 uihelper.uiElement(easygame.load_image("Assets/Buttons/png/Dummy/Rect-Icon-Blue/Idle_big.png"),(225,window.height-305),group=shopui,scale=1*x_scale,enabled=False,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/archer_level_1.png"),(275,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyArcherTower,ui=True)
-uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_1.png"),(475,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyMageTower,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/wizard_level_3.png"),(475,window.height-240),group=shopui,scale=1.1*x_scale,enabled=True,callback=buyMageTower,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Barrack/sword.png"),(715,window.height-235),group=shopui,scale=2.5*x_scale,enabled=True,callback=buyDamageUpgrade,ui=True)
 uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Archer/bow_animation(3).png"),(900,window.height-235),group=shopui,scale=2.5*x_scale,enabled=True,callback=buySpeedUpgrade,ui=True)
+uihelper.uiElement(easygame.load_image("Assets/Sprites/Towers/Wizard/stick.png"),(1125,window.height-235),group=shopui,scale=2.5*x_scale,enabled=True,callback=buyBomb,ui=True)
 archerPriceDisplay = uihelper.textElement(str(100*difficultyModifier),"Poppins",30,((315,window.height-290)),ui=True,group=shopui)
 magePriceDisplay = uihelper.textElement(str(200*difficultyModifier),"Poppins",30,((515,window.height-290)),ui=True,group=shopui)
+bombPriceDisplay = uihelper.textElement(str(1000*difficultyModifier),"Poppins",30,((1110,window.height-290)),ui=True,group=shopui)
 damageUpgradePriceDisplay = uihelper.textElement(str(damageUpgradePrice),"Poppins",30,((705,window.height-290)),ui=True,group=shopui)
 damageUpgradeDisplay = uihelper.textElement(str(damageUpgrade) + "x","Poppins",30,((730,window.height-125)),ui=True,group=shopui)
 speedUpgradePriceDisplay = uihelper.textElement(str(speedUpgradePrice),"Poppins",30,((905,window.height-290)),ui=True,group=shopui)
@@ -144,6 +153,8 @@ while not should_quit:
                 window.set_fullscreen(fullscreen)
             elif event.key == "ESC":
                 cancel = True
+            elif event.key == "E":
+                toggleShop(None)
         elif evtype is easygame.KeyUpEvent:
             if event.key == "ESC":
                 cancel = False
@@ -156,12 +167,18 @@ while not should_quit:
     """scene prep"""
     easygame.fill(0.200, 0.230, 0.245)
     uihelper.drawCentered(mapi,scale=0.15,position=(offset,offsetY),window=window)
+    easygame.draw_image(palace, (461,684), scale=0.3)
 
     spawnEnemies()
     
     """logic"""
     for enemy in enemies.elements:
-        enemy.move()
+        if enemy.move():
+            CASTLEHEALTH-=1
+    
+    if CASTLEHEALTH <= 0:
+        print("You lost! Try again!")
+        exit()
 
     if placetower:
         if cancel:
@@ -172,6 +189,13 @@ while not should_quit:
             BALANCE-=tower.price
             placetower = False
             tower = None
+        
+    if placebomb:
+        if cancel:
+            placebomb = False
+        elif uihelper.placeBomb(enemies,mousex+camera.position[0]*2,mousey+camera.position[1]*2,downrm,BALANCE,difficultyModifier):
+            BALANCE-=1000*difficultyModifier
+            placebomb = False
 
     for tower in towers.elements:
         r=tower.cooldownCheck(enemies, projectiles, damageUpgrade, speedUpgrade)
@@ -182,8 +206,10 @@ while not should_quit:
     difficultyModifier = 1+killcounter/2000
 
     BALANCEDisplay.text = str(round(BALANCE,1))
+    CASTLEHEALTHDisplay.text = str(CASTLEHEALTH)
     archerPriceDisplay.text = str(round(100*difficultyModifier,1))
     magePriceDisplay.text = str(round(200*difficultyModifier,1))
+    bombPriceDisplay.text = str(round(1000*difficultyModifier,1))
     damageUpgradeDisplay.text = str(round(damageUpgrade,1)) + "x"
     damageUpgradePriceDisplay.text = str(damageUpgradePrice)
     speedUpgradeDisplay.text = str(round(speedUpgrade,2)) + "x"
