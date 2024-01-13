@@ -6,3 +6,4 @@
 - [x] hudba
 - [x] bomba
 - [x] prehra
+- [ ] scale difficulty
