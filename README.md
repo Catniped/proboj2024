@@ -1,10 +1,11 @@
 # Hra Rieka
-Je to hra na proboj, ktorý sa konal 12.1.2024 vo Floriho chate pri Bardejove.
+Je to hra na proboj, ktorý sa konal 12.1.2024 na Floriho chate pri Bardejove.
 
 # Pred inštaláciou
 Na spustenie je potrebné mať nainštalované tieto veci:
 - Python (minimálna verzia 3.11)
 - pip
+- font poppins
 
 # Inštalácia
 1. Naklonuj si repozitár alebo si stiahni [ZIP súbor](https://github.com/Catniped/proboj2024/zipball/main)
